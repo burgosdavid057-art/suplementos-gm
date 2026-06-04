@@ -1,0 +1,107 @@
+<section class="w-full max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+  <h1 class="brand-title text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8">Tu carrito</h1>
+
+  <div id="cart-empty" class="hidden text-center py-20 bg-white border border-silver-200 rounded-2xl">
+    <div class="mx-auto w-16 h-16 rounded-full bg-silver flex items-center justify-center text-carbon-soft mb-4"><?= icon('cart', 'w-8 h-8') ?></div>
+    <p class="text-carbon-soft mb-6">Aún no has añadido productos al carrito.</p>
+    <a href="/productos" class="btn-primary">Ir al catálogo</a>
+  </div>
+
+  <div id="cart-content" class="hidden cart-layout">
+    <ul id="cart-items" class="cart-main divide-y divide-silver-200 border border-silver-200 rounded-2xl bg-white overflow-hidden"></ul>
+
+    <aside class="cart-aside bg-silver rounded-2xl p-5 sm:p-6 h-fit">
+      <h2 class="font-bold text-lg mb-4">Resumen</h2>
+      <dl class="space-y-2 text-sm">
+        <div class="flex justify-between">
+          <dt class="text-carbon-soft">Subtotal</dt>
+          <dd id="cart-subtotal" class="font-semibold">$0</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-carbon-soft">Envío</dt>
+          <dd class="text-xs text-right text-carbon-soft">
+            Desde $0<br>
+            <span class="text-[10px]">según método elegido</span>
+          </dd>
+        </div>
+      </dl>
+      <div class="border-t border-silver-200 mt-5 pt-4 flex justify-between text-base">
+        <strong>Total parcial</strong>
+        <strong id="cart-total" class="text-brand-600">$0</strong>
+      </div>
+      <div class="mt-3 rounded-lg bg-white border border-silver-200 px-3 py-2 text-xs text-carbon-soft space-y-1.5">
+        <p class="font-bold text-carbon">Métodos de envío disponibles:</p>
+        <p class="inline-flex items-center gap-1.5"><?= icon('truck', 'w-3.5 h-3.5 text-brand-600') ?> InterRapidísimo · <strong>pago contra entrega</strong></p>
+        <p class="inline-flex items-center gap-1.5"><?= icon('bus', 'w-3.5 h-3.5 text-brand-600') ?> Bus a Terminal Medellín · <strong>$15.000</strong></p>
+        <p class="inline-flex items-center gap-1.5"><?= icon('map-pin', 'w-3.5 h-3.5 text-brand-600') ?> Oriente cercano · <strong>$10.000</strong></p>
+      </div>
+      <a href="/checkout" class="mt-6 w-full inline-flex items-center justify-center h-12 rounded-md bg-brand-500 text-white font-bold shadow-md shadow-brand-500/30 hover:bg-brand-600 transition">
+        Continuar al pago
+      </a>
+      <a href="/productos" class="mt-2 w-full inline-flex items-center justify-center h-10 text-sm text-carbon-soft hover:text-brand-600">
+        Seguir comprando
+      </a>
+      <button type="button" onclick="if(confirm('¿Vaciar carrito?')){Cart.clear();renderCart();}"
+              class="mt-2 w-full text-xs text-carbon-soft hover:text-red-600 py-2">
+        Vaciar carrito
+      </button>
+    </aside>
+  </div>
+</section>
+
+<template id="cart-row-template">
+  <li class="p-4 flex items-center gap-4">
+    <div class="w-20 h-20 bg-silver rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center text-carbon-soft">
+      <img class="row-image w-full h-full object-cover hidden">
+      <span class="row-fallback"><?= icon('package', 'w-7 h-7') ?></span>
+    </div>
+    <div class="flex-1 min-w-0">
+      <div class="row-name font-semibold line-clamp-2"></div>
+      <div class="row-price text-xs text-carbon-soft mt-1"></div>
+    </div>
+    <div class="flex items-center rounded-md border border-silver-200">
+      <button class="row-minus w-8 h-9 hover:bg-silver text-lg leading-none">−</button>
+      <span class="row-qty w-8 text-center text-sm font-bold"></span>
+      <button class="row-plus w-8 h-9 hover:bg-silver text-lg leading-none">+</button>
+    </div>
+    <div class="row-subtotal w-24 text-right font-extrabold text-brand-600"></div>
+    <button class="row-remove p-2 text-carbon-soft hover:text-red-600 transition" title="Quitar" aria-label="Quitar"><?= icon('x', 'w-4 h-4') ?></button>
+  </li>
+</template>
+
+<script>
+function money(c){return '$' + Number(c).toLocaleString('es-CO').replace(/,/g, '.')}
+function renderCart() {
+  const items = Cart.items();
+  document.getElementById('cart-empty').classList.toggle('hidden', items.length > 0);
+  document.getElementById('cart-content').classList.toggle('hidden', items.length === 0);
+  if (!items.length) return;
+
+  const list = document.getElementById('cart-items');
+  list.innerHTML = '';
+  const tpl = document.getElementById('cart-row-template');
+
+  for (const it of items) {
+    const node = tpl.content.cloneNode(true);
+    const root = node.querySelector('li');
+    if (it.image) {
+      const img = root.querySelector('.row-image');
+      img.src = it.image;
+      img.classList.remove('hidden');
+      root.querySelector('.row-fallback').classList.add('hidden');
+    }
+    root.querySelector('.row-name').textContent = it.name;
+    root.querySelector('.row-price').textContent = money(it.price) + ' c/u';
+    root.querySelector('.row-qty').textContent = it.qty;
+    root.querySelector('.row-subtotal').textContent = money(it.price * it.qty);
+    root.querySelector('.row-minus').addEventListener('click', () => Cart.set(it.id, it.qty - 1));
+    root.querySelector('.row-plus').addEventListener('click',  () => Cart.set(it.id, it.qty + 1));
+    root.querySelector('.row-remove').addEventListener('click',() => Cart.remove(it.id));
+    list.appendChild(node);
+  }
+  document.getElementById('cart-subtotal').textContent = money(Cart.subtotal());
+  document.getElementById('cart-total').textContent    = money(Cart.subtotal());
+}
+document.addEventListener('DOMContentLoaded', renderCart);
+document.addEventListener('cart:updated', renderCart);
+</script>

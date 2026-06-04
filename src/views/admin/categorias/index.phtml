@@ -1,0 +1,77 @@
+<?php
+/** @var array $categories */
+/** @var array $errors */
+/** @var array $old */
+?>
+
+<div class="space-y-6">
+  <div>
+    <h1 class="brand-title text-3xl font-bold">Categorías</h1>
+    <p class="mt-1 text-sm text-carbon-soft"><?= count($categories) ?> categoría<?= count($categories) === 1 ? '' : 's' ?></p>
+  </div>
+
+  <!-- Form crear -->
+  <form method="post" action="/admin/categorias" class="rounded-xl border border-silver-200 bg-white p-5">
+    <?= csrf_field() ?>
+    <h2 class="font-semibold text-brand-700 mb-4">+ Nueva categoría</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div>
+        <input name="name" required placeholder="Nombre" value="<?= e($old['name'] ?? '') ?>"
+               class="w-full rounded-lg border border-silver-200 px-3 py-2 focus:border-brand-500 focus:outline-none">
+        <?php if (isset($errors['name'])): ?><p class="mt-1 text-xs text-red-600"><?= e($errors['name']) ?></p><?php endif; ?>
+      </div>
+      <div>
+        <input name="slug" placeholder="Slug (auto)" value="<?= e($old['slug'] ?? '') ?>"
+               class="w-full rounded-lg border border-silver-200 px-3 py-2 focus:border-brand-500 focus:outline-none">
+        <?php if (isset($errors['slug'])): ?><p class="mt-1 text-xs text-red-600"><?= e($errors['slug']) ?></p><?php endif; ?>
+      </div>
+      <div>
+        <input name="order" type="number" placeholder="Orden" value="<?= e((string)($old['order'] ?? 100)) ?>"
+               class="w-full rounded-lg border border-silver-200 px-3 py-2 focus:border-brand-500 focus:outline-none">
+      </div>
+      <button class="rounded-md bg-brand-500 px-4 py-2 font-semibold text-white hover:bg-brand-600 transition">Crear</button>
+    </div>
+    <input name="description" placeholder="Descripción (opcional)" value="<?= e($old['description'] ?? '') ?>"
+           class="mt-3 w-full rounded-lg border border-silver-200 px-3 py-2 focus:border-brand-500 focus:outline-none">
+  </form>
+
+  <!-- Listado / edit inline -->
+  <div class="overflow-hidden rounded-xl border border-silver-200 bg-white">
+    <table class="w-full text-sm">
+      <thead class="bg-silver text-left text-xs uppercase tracking-wide text-carbon-soft">
+        <tr>
+          <th class="px-4 py-3">Nombre</th>
+          <th class="px-4 py-3">Slug</th>
+          <th class="px-4 py-3">Descripción</th>
+          <th class="px-4 py-3 w-20">Orden</th>
+          <th class="px-4 py-3 text-right">Productos</th>
+          <th class="px-4 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-silver-200">
+        <?php foreach ($categories as $c): ?>
+          <tr>
+            <form method="post" action="/admin/categorias/<?= e($c['id']) ?>" class="contents">
+              <?= csrf_field() ?>
+              <td class="px-4 py-3"><input name="name" value="<?= e($c['name']) ?>" required class="w-full rounded border border-transparent hover:border-silver-200 focus:border-brand-500 focus:outline-none px-2 py-1"></td>
+              <td class="px-4 py-3"><input name="slug" value="<?= e($c['slug']) ?>" required class="w-full rounded border border-transparent hover:border-silver-200 focus:border-brand-500 focus:outline-none px-2 py-1 font-mono text-xs"></td>
+              <td class="px-4 py-3"><input name="description" value="<?= e($c['description'] ?? '') ?>" placeholder="—" class="w-full rounded border border-transparent hover:border-silver-200 focus:border-brand-500 focus:outline-none px-2 py-1"></td>
+              <td class="px-4 py-3"><input name="order" type="number" value="<?= e((string)$c['order']) ?>" class="w-16 rounded border border-transparent hover:border-silver-200 focus:border-brand-500 focus:outline-none px-2 py-1"></td>
+              <td class="px-4 py-3 text-right"><?= (int)$c['product_count'] ?></td>
+              <td class="px-4 py-3 text-right whitespace-nowrap">
+                <button class="text-sm font-medium text-brand-600 hover:underline">Guardar</button>
+            </form>
+                <form method="post" action="/admin/categorias/<?= e($c['id']) ?>/delete" class="inline ml-3"
+                      onsubmit="return confirm('¿Eliminar &quot;<?= e($c['name']) ?>&quot;?');">
+                  <?= csrf_field() ?>
+                  <button class="text-sm font-medium text-red-600 hover:underline" <?= ((int)$c['product_count'] > 0) ? 'disabled title="Tiene productos asignados"' : '' ?>>
+                    Borrar
+                  </button>
+                </form>
+              </td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
+</div>

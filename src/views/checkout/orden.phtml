@@ -1,0 +1,215 @@
+<?php
+/**
+ * @var array  $order
+ * @var array  $items
+ * @var bool   $wompi_configured
+ * @var string $wompi_public_key
+ * @var ?string $integrity_signature
+ * @var string $redirect_url
+ */
+$status = $order['status'];
+$statusLabel = [
+    'PENDING'   => ['Pendiente de pago',  'amber',   'clock'],
+    'PAID'      => ['Pago confirmado',    'brand',   'check'],
+    'FAILED'    => ['Pago rechazado',     'red',     'x'],
+    'SHIPPED'   => ['Enviado',            'blue',    'truck'],
+    'DELIVERED' => ['Entregado',          'neutral', 'package'],
+    'CANCELLED' => ['Cancelado',          'neutral', 'x'],
+][$status] ?? ['Estado: ' . $status, 'neutral', 'info'];
+
+$badgeColors = [
+    'amber'   => 'bg-amber-100 text-amber-800 border-amber-300',
+    'brand'   => 'bg-brand-100 text-brand-800 border-brand-300',
+    'red'     => 'bg-red-100 text-red-800 border-red-300',
+    'blue'    => 'bg-blue-100 text-blue-800 border-blue-300',
+    'neutral' => 'bg-silver text-carbon border-silver-200',
+][$statusLabel[1]];
+
+$waMessage = "Hola, hice el pedido " . $order['order_number'] . " por " . money((int)$order['total']) . " en la tienda. ¿Cómo coordino el pago y envío?";
+$waUrl = 'https://wa.me/573105043520?text=' . rawurlencode($waMessage);
+?>
+
+<section class="max-w-3xl mx-auto px-4 md:px-6 py-10">
+  <a href="/productos" class="text-sm text-brand-600 hover:underline">← Seguir comprando</a>
+
+  <!-- Header con estado -->
+  <div class="mt-4 rounded-2xl border <?= e($badgeColors) ?> p-5">
+    <div class="flex items-start gap-3">
+      <div class="shrink-0">
+        <?= icon($statusLabel[2], 'w-8 h-8') ?>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold leading-tight"><?= e($statusLabel[0]) ?></h1>
+        <p class="mt-1 text-sm">
+          Pedido <span class="font-mono font-semibold"><?= e($order['order_number']) ?></span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bloque de pago -->
+  <div class="mt-6 rounded-2xl border border-silver-200 bg-white p-6">
+    <h2 class="text-lg font-bold mb-3">¿Cómo pagas?</h2>
+
+    <?php if ($status === 'PAID'): ?>
+      <p class="text-carbon-soft">
+        Ya recibimos tu pago. Te contactaremos por WhatsApp para coordinar la entrega.
+      </p>
+
+    <?php elseif ($wompi_configured && $integrity_signature): ?>
+      <p class="text-carbon-soft mb-4">
+        Paga con seguridad usando PSE, Nequi o tarjeta. Procesado por Wompi.
+      </p>
+      <form action="https://checkout.wompi.co/p/" method="GET" target="_blank" rel="noopener">
+        <input type="hidden" name="public-key"            value="<?= e($wompi_public_key) ?>">
+        <input type="hidden" name="currency"              value="COP">
+        <input type="hidden" name="amount-in-cents"       value="<?= (int)$order['total'] * 100 ?>">
+        <input type="hidden" name="reference"             value="<?= e($order['order_number']) ?>">
+        <input type="hidden" name="signature:integrity"   value="<?= e($integrity_signature) ?>">
+        <input type="hidden" name="redirect-url"          value="<?= e($redirect_url) ?>">
+        <input type="hidden" name="customer-data:email"        value="<?= e($order['customer_email']) ?>">
+        <input type="hidden" name="customer-data:full-name"    value="<?= e($order['customer_name']) ?>">
+        <input type="hidden" name="customer-data:phone-number" value="<?= e(preg_replace('/\D/', '', $order['customer_phone']) ?? '') ?>">
+        <input type="hidden" name="customer-data:phone-number-prefix" value="+57">
+        <?php if (!empty($order['customer_doc_id'])): ?>
+          <input type="hidden" name="customer-data:legal-id"      value="<?= e($order['customer_doc_id']) ?>">
+          <input type="hidden" name="customer-data:legal-id-type" value="<?= e($order['customer_doc_type'] ?? 'CC') ?>">
+        <?php endif; ?>
+        <input type="hidden" name="shipping-address:address-line-1" value="<?= e($order['shipping_address']) ?>">
+        <input type="hidden" name="shipping-address:city"           value="<?= e($order['shipping_city']) ?>">
+        <input type="hidden" name="shipping-address:region"         value="<?= e($order['shipping_state']) ?>">
+        <input type="hidden" name="shipping-address:country"        value="CO">
+        <input type="hidden" name="shipping-address:phone-number"   value="<?= e(preg_replace('/\D/', '', $order['customer_phone']) ?? '') ?>">
+
+        <button type="submit" class="w-full h-12 rounded-md bg-brand-500 text-white font-bold shadow-md shadow-brand-500/30 hover:bg-brand-600 transition">
+          Pagar <?= e(money((int)$order['total'])) ?> →
+        </button>
+      </form>
+
+    <?php else: ?>
+      <!-- Wompi aún no totalmente configurado: fallback WhatsApp -->
+      <div class="rounded-lg border-2 border-dashed border-amber-300 bg-amber-50 p-4 mb-4">
+        <p class="text-sm text-amber-900">
+          <strong>El pago en línea está temporalmente en pruebas.</strong>
+          Por ahora coordina el pago directamente con la dueña por WhatsApp:
+          ella te confirma disponibilidad de stock y te envía los datos para
+          consignación o transferencia.
+        </p>
+      </div>
+      <a href="<?= e($waUrl) ?>" target="_blank" rel="noopener"
+         class="w-full inline-flex items-center justify-center gap-2 h-12 rounded-md bg-[#25D366] text-white font-bold shadow-md hover:bg-[#1ebd5a] transition">
+        Coordinar pago por WhatsApp →
+      </a>
+    <?php endif; ?>
+  </div>
+
+  <!-- Detalle del pedido -->
+  <div class="mt-6 rounded-2xl border border-silver-200 bg-white p-6">
+    <h2 class="text-lg font-bold mb-3">Detalle</h2>
+
+    <ul class="divide-y divide-silver-200">
+      <?php foreach ($items as $it): ?>
+        <li class="py-3 flex justify-between text-sm">
+          <span><?= e($it['product_name']) ?> <span class="text-carbon-soft">×<?= (int)$it['quantity'] ?></span></span>
+          <span class="font-medium"><?= e(money((int)$it['subtotal'])) ?></span>
+        </li>
+      <?php endforeach; ?>
+    </ul>
+
+    <dl class="mt-4 pt-4 border-t border-silver-200 space-y-1.5 text-sm">
+      <div class="flex justify-between">
+        <dt class="text-carbon-soft">Subtotal</dt>
+        <dd><?= e(money((int)$order['subtotal'])) ?></dd>
+      </div>
+      <div class="flex justify-between">
+        <dt class="text-carbon-soft">Envío</dt>
+        <dd><?= e(money((int)$order['shipping_cost'])) ?></dd>
+      </div>
+      <div class="flex justify-between border-t border-silver-200 pt-2 mt-2 text-base">
+        <dt class="font-bold">Total</dt>
+        <dd class="font-extrabold text-brand-600"><?= e(money((int)$order['total'])) ?></dd>
+      </div>
+    </dl>
+  </div>
+
+  <!-- Método de envío + tiempo estimado -->
+  <?php if ($shipping_method ?? null): ?>
+    <div class="mt-6 rounded-2xl border-2 border-brand-200 bg-brand-50/30 p-5">
+      <div class="flex items-start gap-3">
+        <div class="shrink-0 w-12 h-12 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center"><?= icon($shipping_method['icon'], 'w-6 h-6') ?></div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-bold uppercase tracking-wider text-brand-600">Método de envío</p>
+          <h3 class="mt-1 font-bold text-carbon"><?= e($shipping_method['name']) ?></h3>
+          <p class="mt-0.5 text-sm text-brand-700 font-semibold"><?= e($shipping_method['tagline']) ?></p>
+          <p class="mt-2 text-sm text-carbon-soft"><?= e($shipping_method['description']) ?></p>
+          <p class="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-carbon">
+            <?= icon('clock', 'w-4 h-4') ?> Tiempo estimado: <span class="text-brand-700"><?= e($shipping_method['eta_label']) ?></span>
+          </p>
+          <?php if (!empty($shipping_eta_text)): ?>
+            <p class="mt-1 text-xs text-carbon-soft"><?= e($shipping_eta_text) ?></p>
+          <?php endif; ?>
+        </div>
+      </div>
+    </div>
+  <?php endif; ?>
+
+  <!-- Datos de facturación, contacto y envío -->
+  <div class="mt-6 grid gap-4 md:grid-cols-2">
+    <div class="rounded-2xl border border-silver-200 bg-white p-5 text-sm">
+      <h3 class="font-bold uppercase text-xs tracking-wider text-brand-600 mb-2">
+        <?= ($order['customer_type'] ?? 'natural') === 'juridica' ? 'Razón social' : 'Comprador' ?>
+      </h3>
+      <p class="font-semibold"><?= e($order['customer_name']) ?></p>
+      <p class="text-carbon-soft"><?= e($order['customer_doc_type'] ?? 'CC') ?> <?= e($order['customer_doc_id'] ?? '—') ?></p>
+      <p class="text-carbon-soft"><?= e($order['customer_email']) ?></p>
+      <p class="text-carbon-soft"><?= e($order['customer_phone']) ?></p>
+      <?php if (!empty($order['billing_address'])): ?>
+        <div class="mt-3 pt-3 border-t border-silver-200">
+          <p class="text-[10px] font-bold uppercase tracking-wider text-carbon-soft mb-1">Facturación</p>
+          <p><?= e($order['billing_address']) ?></p>
+          <p class="text-carbon-soft"><?= e($order['billing_city']) ?>, <?= e($order['billing_state']) ?></p>
+        </div>
+      <?php endif; ?>
+    </div>
+    <div class="rounded-2xl border border-silver-200 bg-white p-5 text-sm">
+      <h3 class="font-bold uppercase text-xs tracking-wider text-brand-600 mb-2">
+        <?= ($order['shipping_method'] ?? '') === 'bus' ? 'Recoges en' : 'Dirección de envío' ?>
+      </h3>
+      <p><?= e($order['shipping_address']) ?></p>
+      <p class="text-carbon-soft"><?= e($order['shipping_city']) ?>, <?= e($order['shipping_state']) ?></p>
+      <?php if (!empty($order['shipping_notes'])): ?>
+        <p class="mt-2 italic text-carbon-soft text-xs">"<?= e($order['shipping_notes']) ?>"</p>
+      <?php endif; ?>
+    </div>
+  </div>
+
+  <?php if ($status === 'PENDING'): ?>
+    <p class="mt-6 text-center text-xs text-carbon-soft">
+      Recibirás un correo de confirmación cuando tu pago sea procesado.
+    </p>
+  <?php endif; ?>
+</section>
+
+<?php if ($status === 'PENDING'): ?>
+<script>
+  // El carrito ya se materializó como pedido; vacía el localStorage para
+  // que el usuario no quede con productos duplicados si vuelve atrás.
+  if (window.Cart) Cart.clear();
+
+  // Auto-refresh cada 6 segundos para detectar cuando el webhook actualiza
+  // la orden a PAID. Se detiene si el usuario navega o si la pestaña está
+  // oculta para no consumir batería innecesariamente.
+  (function () {
+    let timer = null;
+    function tick() {
+      if (document.visibilityState === 'visible') {
+        location.reload();
+      } else {
+        timer = setTimeout(tick, 6000);
+      }
+    }
+    timer = setTimeout(tick, 6000);
+    window.addEventListener('beforeunload', () => { if (timer) clearTimeout(timer); });
+  })();
+</script>
+<?php endif; ?>

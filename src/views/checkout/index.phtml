@@ -1,0 +1,457 @@
+<?php
+/**
+ * @var array  $methods    catálogo de métodos de envío (Shipping::methods())
+ * @var array  $terminals  ['norte' => 'Terminal del Norte (Medellín)', ...]
+ * @var string $csrf
+ * @var array  $errors     (opcional)
+ * @var array  $old        (opcional)
+ */
+$errors = $errors ?? [];
+$old = $old ?? [];
+$selectedMethod = $old['methodId'] ?? 'interrapidisimo';
+$customerType   = $old['customerType'] ?? 'natural';
+$docType        = $old['docType']      ?? ($customerType === 'juridica' ? 'NIT' : 'CC');
+$shipSame       = array_key_exists('shipSameAsBilling', $old) ? (bool)$old['shipSameAsBilling'] : true;
+
+$old_value = fn(string $key): string => e((string)($old[$key] ?? ''));
+$err_msg = function(string $key) use ($errors): string {
+    return isset($errors[$key])
+        ? '<p class="mt-1 text-xs text-red-600">' . e($errors[$key]) . '</p>'
+        : '';
+};
+$input_cls = 'w-full rounded-lg border border-silver-200 px-3 py-2.5 text-sm bg-white outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20';
+?>
+
+<section class="w-full max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+  <a href="/carrito" class="text-sm text-brand-600 hover:underline">← Volver al carrito</a>
+  <h1 class="brand-title text-2xl sm:text-3xl md:text-4xl font-bold mt-3">Finalizar compra</h1>
+  <p class="mt-2 text-sm sm:text-base text-carbon-soft">Completa tus datos de facturación y elige cómo recibir tu pedido.</p>
+
+  <?php if (isset($errors['items'])): ?>
+    <div class="mt-6 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+      <?= e($errors['items']) ?>
+    </div>
+  <?php endif; ?>
+
+  <form id="checkout-form" method="post" action="/checkout" class="mt-6 sm:mt-8 flex flex-col lg:grid lg:grid-cols-[1fr_360px] gap-5 sm:gap-6">
+    <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
+    <input type="hidden" id="items-json" name="items" value="">
+
+    <div class="space-y-5 min-w-0">
+
+      <!-- ─── 1) Datos del comprador (facturación) ───────── -->
+      <fieldset class="rounded-2xl border border-silver-200 bg-white p-5">
+        <legend class="px-2 text-sm font-bold uppercase tracking-wider text-brand-600">1. Datos de facturación</legend>
+
+        <!-- Tipo de persona: tabs -->
+        <div class="grid grid-cols-2 gap-2 mb-5 p-1 bg-silver rounded-xl">
+          <label class="cursor-pointer">
+            <input type="radio" name="customer_type" value="natural" <?= $customerType === 'natural' ? 'checked' : '' ?> class="peer sr-only" data-customer-type>
+            <span class="flex items-center justify-center gap-2 h-10 rounded-lg text-sm font-semibold text-carbon-soft transition peer-checked:bg-white peer-checked:text-carbon peer-checked:shadow-sm">
+              <?= icon('user', 'w-4 h-4') ?> Persona natural
+            </span>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="customer_type" value="juridica" <?= $customerType === 'juridica' ? 'checked' : '' ?> class="peer sr-only" data-customer-type>
+            <span class="flex items-center justify-center gap-2 h-10 rounded-lg text-sm font-semibold text-carbon-soft transition peer-checked:bg-white peer-checked:text-carbon peer-checked:shadow-sm">
+              <?= icon('building', 'w-4 h-4') ?> Persona jurídica
+            </span>
+          </label>
+        </div>
+
+        <!-- Nombre / Razón social -->
+        <label class="block">
+          <span class="block text-sm font-semibold text-carbon mb-1">
+            <span data-label-natural class="<?= $customerType === 'juridica' ? 'hidden' : '' ?>">Nombre completo *</span>
+            <span data-label-juridica class="<?= $customerType === 'natural' ? 'hidden' : '' ?>">Razón social *</span>
+          </span>
+          <input type="text" name="customer_name" required value="<?= $old_value('name') ?>" class="<?= $input_cls ?>">
+          <?= $err_msg('customer_name') ?>
+        </label>
+
+        <!-- Tipo de doc + Número -->
+        <div class="grid grid-cols-[110px_1fr] gap-3 mt-4">
+          <label class="block">
+            <span class="block text-sm font-semibold text-carbon mb-1">Tipo *</span>
+            <select name="customer_doc_type" class="<?= $input_cls ?>" data-doc-type>
+              <!-- Las opciones se filtran dinámicamente según tipo de persona -->
+              <option value="CC"  data-for="natural"  <?= $docType === 'CC'  ? 'selected' : '' ?>>CC</option>
+              <option value="CE"  data-for="natural"  <?= $docType === 'CE'  ? 'selected' : '' ?>>CE</option>
+              <option value="PP"  data-for="natural"  <?= $docType === 'PP'  ? 'selected' : '' ?>>PP</option>
+              <option value="TI"  data-for="natural"  <?= $docType === 'TI'  ? 'selected' : '' ?>>TI</option>
+              <option value="NIT" data-for="juridica" <?= $docType === 'NIT' ? 'selected' : '' ?>>NIT</option>
+            </select>
+          </label>
+          <label class="block">
+            <span class="block text-sm font-semibold text-carbon mb-1">
+              <span data-label-doc-natural class="<?= $customerType === 'juridica' ? 'hidden' : '' ?>">Número de documento *</span>
+              <span data-label-doc-juridica class="<?= $customerType === 'natural' ? 'hidden' : '' ?>">Número de NIT *</span>
+            </span>
+            <input type="text" name="customer_doc_id" required value="<?= $old_value('docId') ?>" placeholder="Solo números (sin puntos ni guiones)" class="<?= $input_cls ?>">
+            <?= $err_msg('customer_doc_id') ?>
+          </label>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2 mt-4">
+          <label class="block">
+            <span class="block text-sm font-semibold text-carbon mb-1">Correo *</span>
+            <input type="email" name="customer_email" required value="<?= $old_value('email') ?>" class="<?= $input_cls ?>">
+            <?= $err_msg('customer_email') ?>
+          </label>
+          <label class="block">
+            <span class="block text-sm font-semibold text-carbon mb-1">WhatsApp / Teléfono *</span>
+            <input type="tel" name="customer_phone" required placeholder="3105043520" value="<?= $old_value('phone') ?>" class="<?= $input_cls ?>">
+            <?= $err_msg('customer_phone') ?>
+          </label>
+        </div>
+
+        <!-- Dirección de facturación -->
+        <div class="mt-5 pt-5 border-t border-silver-200">
+          <p class="text-xs font-bold uppercase tracking-wider text-carbon-soft mb-3">Dirección de facturación</p>
+
+          <label class="block">
+            <span class="block text-sm font-semibold text-carbon mb-1">Dirección *</span>
+            <input type="text" name="billing_address" required placeholder="Calle 10 # 20-30, apto 401" value="<?= $old_value('billingAddress') ?>" class="<?= $input_cls ?>">
+            <?= $err_msg('billing_address') ?>
+          </label>
+
+          <div class="grid gap-4 md:grid-cols-2 mt-4">
+            <label class="block">
+              <span class="block text-sm font-semibold text-carbon mb-1">Ciudad / Municipio *</span>
+              <input type="text" name="billing_city" required value="<?= $old_value('billingCity') ?>" class="<?= $input_cls ?>">
+              <?= $err_msg('billing_city') ?>
+            </label>
+            <label class="block">
+              <span class="block text-sm font-semibold text-carbon mb-1">Departamento *</span>
+              <input type="text" name="billing_state" required value="<?= $old_value('billingState') ?>" class="<?= $input_cls ?>">
+              <?= $err_msg('billing_state') ?>
+            </label>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- ─── 2) Método de envío ────────────────── -->
+      <fieldset class="rounded-2xl border border-silver-200 bg-white p-5">
+        <legend class="px-2 text-sm font-bold uppercase tracking-wider text-brand-600">2. ¿Cómo quieres recibirlo?</legend>
+
+        <div class="space-y-3">
+          <?php foreach ($methods as $m): ?>
+            <?php $isSel = $m['id'] === $selectedMethod; ?>
+            <label class="shipping-option group flex gap-3 p-4 rounded-xl border-2 cursor-pointer transition <?= $isSel ? 'border-brand-500 bg-brand-50/40' : 'border-silver-200 hover:border-brand-300' ?>">
+              <input type="radio" name="shipping_method" value="<?= e($m['id']) ?>" <?= $isSel ? 'checked' : '' ?>
+                     data-requires-terminal="<?= $m['requires_terminal'] ? '1' : '0' ?>"
+                     data-requires-address="<?= $m['requires_address'] ? '1' : '0' ?>"
+                     class="mt-1 accent-brand-500 shrink-0">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-baseline justify-between gap-2 flex-wrap">
+                  <span class="font-bold text-carbon inline-flex items-center gap-2"><?= icon($m['icon'], 'w-5 h-5 text-brand-600') ?> <?= e($m['name']) ?></span>
+                  <span class="font-extrabold text-brand-700 whitespace-nowrap"><?= e($m['cost_label']) ?></span>
+                </div>
+                <p class="mt-0.5 text-xs font-semibold text-brand-600 uppercase tracking-wide"><?= e($m['tagline']) ?></p>
+                <p class="mt-2 text-sm text-carbon-soft leading-snug"><?= e($m['description']) ?></p>
+                <p class="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-carbon">
+                  <?= icon('clock', 'w-3.5 h-3.5') ?> Tiempo estimado: <?= e($m['eta_label']) ?>
+                </p>
+              </div>
+            </label>
+          <?php endforeach; ?>
+          <?= $err_msg('shipping_method') ?>
+        </div>
+      </fieldset>
+
+      <!-- ─── 3a) Dirección de envío (PCE u Oriente cercano) ──── -->
+      <fieldset id="shipping-address-block" class="rounded-2xl border border-silver-200 bg-white p-5">
+        <legend class="px-2 text-sm font-bold uppercase tracking-wider text-brand-600">3. Dirección de envío</legend>
+
+        <!-- Checkbox "mismo que facturación" -->
+        <label class="flex items-start gap-3 p-3 rounded-lg border-2 border-silver-200 cursor-pointer has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50/40 transition mb-4">
+          <input type="checkbox" name="shipping_same_as_billing" value="1" <?= $shipSame ? 'checked' : '' ?>
+                 data-ship-same class="mt-0.5 accent-brand-500 shrink-0">
+          <span class="flex-1 text-sm">
+            <strong class="block">Usar la misma dirección de facturación</strong>
+            <span class="text-xs text-carbon-soft">Te enviamos al mismo lugar donde facturamos. Destildá si quieres enviar a una dirección distinta.</span>
+          </span>
+        </label>
+
+        <!-- Campos de envío (solo visibles si destildó el checkbox) -->
+        <div data-shipping-fields class="<?= $shipSame ? 'hidden' : '' ?>">
+          <label class="block">
+            <span class="block text-sm font-semibold text-carbon mb-1">Dirección *</span>
+            <input type="text" name="shipping_address" placeholder="Calle 10 # 20-30, apto 401" value="<?= $old_value('address') ?>" class="<?= $input_cls ?>">
+            <?= $err_msg('shipping_address') ?>
+          </label>
+
+          <div class="grid gap-4 md:grid-cols-2 mt-4">
+            <label class="block">
+              <span class="block text-sm font-semibold text-carbon mb-1">Ciudad / Municipio *</span>
+              <input type="text" name="shipping_city" value="<?= $old_value('city') ?>" class="<?= $input_cls ?>">
+              <?= $err_msg('shipping_city') ?>
+            </label>
+            <label class="block" id="state-field">
+              <span class="block text-sm font-semibold text-carbon mb-1">Departamento *</span>
+              <input type="text" name="shipping_state" value="<?= $old_value('state') ?>" class="<?= $input_cls ?>">
+              <?= $err_msg('shipping_state') ?>
+            </label>
+          </div>
+
+          <p id="state-fixed-note" class="hidden mt-2 inline-flex items-center gap-1.5 text-xs text-brand-700">
+            <?= icon('check', 'w-3.5 h-3.5') ?> Departamento fijo: <strong>Antioquia</strong> (entrega local en oriente cercano).
+          </p>
+        </div>
+      </fieldset>
+
+      <!-- ─── 3b) Terminal (solo bus) ──────────────── -->
+      <fieldset id="shipping-terminal-block" class="hidden rounded-2xl border border-silver-200 bg-white p-5">
+        <legend class="px-2 text-sm font-bold uppercase tracking-wider text-brand-600">3. ¿En qué terminal recoges?</legend>
+
+        <div class="space-y-2">
+          <?php foreach ($terminals as $key => $label): ?>
+            <label class="flex items-center gap-3 p-3 rounded-lg border border-silver-200 cursor-pointer hover:border-brand-500 has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50/40">
+              <input type="radio" name="shipping_terminal" value="<?= e($key) ?>" <?= ($old['terminal'] ?? '') === $key ? 'checked' : '' ?> class="accent-brand-500">
+              <span class="font-medium"><?= e($label) ?></span>
+            </label>
+          <?php endforeach; ?>
+        </div>
+        <?= $err_msg('shipping_terminal') ?>
+
+        <p class="mt-3 text-xs text-carbon-soft">
+          Te avisamos por WhatsApp con la guía de la encomienda. Llevas tu cédula y la entregan al portador.
+        </p>
+      </fieldset>
+
+      <!-- ─── 4) Notas opcionales ─────────────────── -->
+      <fieldset class="rounded-2xl border border-silver-200 bg-white p-5">
+        <legend class="px-2 text-sm font-bold uppercase tracking-wider text-brand-600">4. Notas (opcional)</legend>
+        <textarea name="shipping_notes" rows="2" placeholder="Ej. casa color azul, dejar en portería, llamar al llegar…" class="<?= $input_cls ?> resize-none"><?= $old_value('notes') ?></textarea>
+      </fieldset>
+    </div>
+
+    <!-- ─── Resumen lateral ──────────────── -->
+    <aside class="bg-silver rounded-2xl p-5 h-fit lg:sticky lg:top-24">
+      <h2 class="font-bold text-lg mb-4">Resumen</h2>
+
+      <ul id="summary-items" class="space-y-2 text-sm border-b border-silver-200 pb-4">
+        <li class="text-carbon-soft text-center py-4">Cargando carrito…</li>
+      </ul>
+
+      <dl class="mt-4 space-y-2 text-sm">
+        <div class="flex justify-between">
+          <dt class="text-carbon-soft">Subtotal</dt>
+          <dd id="summary-subtotal" class="font-semibold">$0</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-carbon-soft">
+            Envío
+            <span id="summary-method" class="block text-xs font-normal mt-0.5"></span>
+          </dt>
+          <dd id="summary-shipping" class="font-semibold text-right">—</dd>
+        </div>
+      </dl>
+
+      <div id="summary-eta" class="mt-3 hidden rounded-lg bg-white border border-brand-200 px-3 py-2 text-xs text-brand-800"></div>
+
+      <div class="border-t border-silver-200 mt-4 pt-3 flex justify-between text-lg">
+        <strong>Total</strong>
+        <strong id="summary-total" class="text-brand-600">$0</strong>
+      </div>
+
+      <!-- Consentimiento legal (obligatorio para SIC) -->
+      <label class="mt-5 flex items-start gap-2 text-xs text-carbon-soft cursor-pointer">
+        <input type="checkbox" name="terms_accepted" required value="1"
+               class="mt-0.5 accent-brand-500 shrink-0">
+        <span>
+          He leído y acepto los
+          <a href="/legal/terminos" target="_blank" class="text-brand-700 hover:underline">Términos y Condiciones</a>,
+          la <a href="/legal/privacidad" target="_blank" class="text-brand-700 hover:underline">Política de Privacidad</a>
+          y la <a href="/legal/devoluciones" target="_blank" class="text-brand-700 hover:underline">Política de Devoluciones</a>.
+        </span>
+      </label>
+
+      <button type="submit" id="submit-btn"
+              class="mt-4 w-full inline-flex items-center justify-center h-12 rounded-md bg-brand-500 text-white font-bold shadow-md shadow-brand-500/30 hover:bg-brand-600 transition disabled:opacity-50 disabled:cursor-not-allowed">
+        Continuar al pago
+      </button>
+    </aside>
+  </form>
+</section>
+
+<script>
+(function () {
+  const METHODS = <?= json_encode($methods, JSON_UNESCAPED_UNICODE) ?>;
+
+  const moneyAmount = (n) => '$' + Number(n).toLocaleString('es-CO').replace(/,/g, '.');
+
+  const $items   = document.getElementById('summary-items');
+  const $sub     = document.getElementById('summary-subtotal');
+  const $ship    = document.getElementById('summary-shipping');
+  const $methodLine = document.getElementById('summary-method');
+  const $eta     = document.getElementById('summary-eta');
+  const $total   = document.getElementById('summary-total');
+  const $btn     = document.getElementById('submit-btn');
+  const $itemsIn = document.getElementById('items-json');
+  const $addrBlock     = document.getElementById('shipping-address-block');
+  const $termBlock     = document.getElementById('shipping-terminal-block');
+  const $stateField    = document.getElementById('state-field');
+  const $stateFixed    = document.getElementById('state-fixed-note');
+  const $stateInput    = document.querySelector('input[name="shipping_state"]');
+  const $addressInput  = document.querySelector('input[name="shipping_address"]');
+  const $cityInput     = document.querySelector('input[name="shipping_city"]');
+  const $shipSame      = document.querySelector('[data-ship-same]');
+  const $shipFields    = document.querySelector('[data-shipping-fields]');
+  const $docType       = document.querySelector('[data-doc-type]');
+
+  // ─── Toggle persona natural ↔ jurídica ─────────────────
+  function syncCustomerType() {
+    const t = document.querySelector('input[name="customer_type"]:checked')?.value || 'natural';
+    // Labels
+    document.querySelectorAll('[data-label-natural]').forEach(el => el.classList.toggle('hidden', t !== 'natural'));
+    document.querySelectorAll('[data-label-juridica]').forEach(el => el.classList.toggle('hidden', t !== 'juridica'));
+    document.querySelectorAll('[data-label-doc-natural]').forEach(el => el.classList.toggle('hidden', t !== 'natural'));
+    document.querySelectorAll('[data-label-doc-juridica]').forEach(el => el.classList.toggle('hidden', t !== 'juridica'));
+
+    // Filtrar opciones del select de tipo de documento
+    if ($docType) {
+      let firstValid = null;
+      [...$docType.options].forEach(opt => {
+        const matches = opt.dataset.for === t;
+        opt.hidden = !matches;
+        opt.disabled = !matches;
+        if (matches && firstValid === null) firstValid = opt.value;
+      });
+      // Si la opción actual no es válida para este tipo, selecciona la primera válida
+      if ($docType.selectedOptions[0]?.hidden && firstValid) {
+        $docType.value = firstValid;
+      }
+    }
+  }
+  document.querySelectorAll('[data-customer-type]').forEach(r => r.addEventListener('change', syncCustomerType));
+
+  // ─── Toggle dirección de envío = facturación ──────────
+  function syncShipSame() {
+    if (!$shipSame || !$shipFields) return;
+    const same = $shipSame.checked;
+    $shipFields.classList.toggle('hidden', same);
+    // Si está marcado, los campos de envío no son required (los copia el server desde billing)
+    [$addressInput, $cityInput, $stateInput].forEach(inp => {
+      if (!inp) return;
+      if (same) {
+        inp.required = false;
+      } else {
+        // Volver a setear required según el método activo
+        toggleAddressBlocks();
+      }
+    });
+  }
+  if ($shipSame) $shipSame.addEventListener('change', syncShipSame);
+
+  function selectedMethod() {
+    const r = document.querySelector('input[name="shipping_method"]:checked');
+    if (!r) return null;
+    return METHODS.find(m => m.id === r.value) || null;
+  }
+
+  function highlightSelectedCard() {
+    document.querySelectorAll('.shipping-option').forEach(el => {
+      const radio = el.querySelector('input[type=radio]');
+      const sel = radio && radio.checked;
+      el.classList.toggle('border-brand-500', sel);
+      el.classList.toggle('bg-brand-50/40', sel);
+      el.classList.toggle('border-silver-200', !sel);
+    });
+  }
+
+  function toggleAddressBlocks() {
+    const m = selectedMethod();
+    if (!m) return;
+
+    if (m.requires_terminal) {
+      // Bus → mostrar terminal, ocultar dirección de envío
+      $addrBlock.classList.add('hidden');
+      $termBlock.classList.remove('hidden');
+      if ($addressInput) $addressInput.required = false;
+      if ($cityInput) $cityInput.required = false;
+      if ($stateInput) $stateInput.required = false;
+    } else {
+      // PCE u Oriente → mostrar dirección de envío
+      $addrBlock.classList.remove('hidden');
+      $termBlock.classList.add('hidden');
+
+      // Si marcó "mismo que facturación", los campos no son required
+      const same = $shipSame && $shipSame.checked;
+      if ($addressInput) $addressInput.required = !same;
+      if ($cityInput) $cityInput.required = !same;
+
+      if (m.id === 'oriente_cercano') {
+        $stateInput.value = 'Antioquia';
+        $stateInput.readOnly = true;
+        $stateField.classList.add('hidden');
+        $stateFixed.classList.remove('hidden');
+        $stateInput.required = false;
+      } else {
+        $stateInput.readOnly = false;
+        $stateField.classList.remove('hidden');
+        $stateFixed.classList.add('hidden');
+        $stateInput.required = !same;
+      }
+    }
+  }
+
+  function recalc() {
+    const items = (window.Cart && Cart.items()) || [];
+    if (!items.length) {
+      $items.innerHTML = '<li class="text-carbon-soft text-center py-4">Carrito vacío. <a href="/productos" class="text-brand-600 hover:underline">Ir al catálogo</a></li>';
+      $btn.disabled = true;
+      return;
+    }
+    $btn.disabled = false;
+    $itemsIn.value = JSON.stringify(items);
+
+    $items.innerHTML = items.map(it => `
+      <li class="flex justify-between gap-2">
+        <span class="truncate">${escapeHtml(it.name)} <span class="text-carbon-soft">×${it.qty}</span></span>
+        <span class="font-medium">${moneyAmount(it.price * it.qty)}</span>
+      </li>
+    `).join('');
+
+    const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
+    const m = selectedMethod();
+
+    $sub.textContent = moneyAmount(subtotal);
+
+    if (!m) {
+      $ship.textContent = '—';
+      $methodLine.textContent = '';
+      $eta.classList.add('hidden');
+      $total.textContent = moneyAmount(subtotal);
+      return;
+    }
+
+    $methodLine.textContent = m.name;
+    $ship.textContent = m.cost === 0 ? 'Pago al recibir' : moneyAmount(m.cost);
+    $total.textContent = moneyAmount(subtotal + m.cost);
+    $eta.innerHTML = '<strong>Tiempo estimado:</strong> ' + m.eta_label;
+    $eta.classList.remove('hidden');
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  document.querySelectorAll('input[name="shipping_method"]').forEach(r => {
+    r.addEventListener('change', () => {
+      highlightSelectedCard();
+      toggleAddressBlocks();
+      recalc();
+    });
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    syncCustomerType();
+    syncShipSame();
+    highlightSelectedCard();
+    toggleAddressBlocks();
+    recalc();
+  });
+  document.addEventListener('cart:updated', recalc);
+})();
+</script>

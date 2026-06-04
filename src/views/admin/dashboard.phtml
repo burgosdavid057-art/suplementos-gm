@@ -1,0 +1,160 @@
+<?php
+/** @var array $stats */
+/** @var array $orders */
+/** @var array $recent */
+/** @var array $last30 */
+/** @var int $totalRevenue */
+/** @var int $alegraCount */
+/** @var ?string $lastSync */
+
+$STATUS_BADGE = [
+    'PENDING'   => 'bg-amber-100 text-amber-800',
+    'PAID'      => 'bg-brand-100 text-brand-800',
+    'FAILED'    => 'bg-red-100 text-red-700',
+    'SHIPPED'   => 'bg-blue-100 text-blue-800',
+    'DELIVERED' => 'bg-neutral-200 text-neutral-700',
+    'CANCELLED' => 'bg-neutral-200 text-neutral-700',
+];
+$STATUS_LABEL = [
+    'PENDING'   => 'Pendiente', 'PAID'=>'Pagado', 'FAILED'=>'Fallido',
+    'SHIPPED'   => 'Enviado',   'DELIVERED'=>'Entregado', 'CANCELLED'=>'Cancelado',
+];
+$user = admin_user();
+?>
+
+<div class="space-y-8">
+  <div>
+    <h1 class="brand-title text-3xl font-bold">
+      Hola, <?= e($user['name'] ?? 'administradora') ?>
+    </h1>
+    <p class="mt-1 text-carbon-soft">Resumen de la tienda Suplementos GM.</p>
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <a href="/admin/pedidos?status=PAID" class="block rounded-xl border bg-white p-5 transition <?= $orders['paid'] > 0 ? 'border-brand-500 shadow-md shadow-brand-500/10 hover:shadow-lg' : 'border-silver-200 hover:border-brand-300' ?>">
+      <p class="text-sm font-medium text-carbon-soft">Pedidos por procesar</p>
+      <p class="mt-2 text-3xl font-bold text-brand-700"><?= $orders['paid'] ?></p>
+      <p class="mt-1 text-xs text-carbon-soft"><?= $orders['paid'] > 0 ? '✋ Te están esperando' : 'Todo al día' ?></p>
+    </a>
+    <a href="/admin/pedidos?status=PENDING" class="block rounded-xl border border-silver-200 bg-white p-5 transition hover:border-brand-300">
+      <p class="text-sm font-medium text-carbon-soft">Pendientes de pago</p>
+      <p class="mt-2 text-3xl font-bold text-brand-700"><?= $orders['pending'] ?></p>
+      <p class="mt-1 text-xs text-carbon-soft">Esperando confirmación</p>
+    </a>
+    <a href="/admin/productos" class="block rounded-xl border border-silver-200 bg-white p-5 transition hover:border-brand-300">
+      <p class="text-sm font-medium text-carbon-soft">Productos activos</p>
+      <p class="mt-2 text-3xl font-bold text-brand-700"><?= $stats['products_active'] ?>/<?= $stats['products_total'] ?></p>
+      <p class="mt-1 text-xs text-carbon-soft">Visibles en la tienda</p>
+    </a>
+    <a href="/admin/pedidos" class="block rounded-xl border border-silver-200 bg-white p-5 transition hover:border-brand-300">
+      <p class="text-sm font-medium text-carbon-soft">Ingresos últimos 30 días</p>
+      <p class="mt-2 text-2xl font-bold text-brand-700"><?= money($last30['revenue']) ?></p>
+      <p class="mt-1 text-xs text-carbon-soft"><?= $last30['count'] ?> pedidos pagados</p>
+    </a>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-2">
+    <!-- Pedidos recientes -->
+    <section class="rounded-xl border border-silver-200 bg-white">
+      <div class="flex items-center justify-between border-b border-silver-200 p-5">
+        <h2 class="font-semibold text-brand-700">Pedidos recientes</h2>
+        <a href="/admin/pedidos" class="text-sm font-medium text-brand-600 hover:underline">Ver todos →</a>
+      </div>
+      <?php if (empty($recent)): ?>
+        <p class="p-8 text-center text-sm text-carbon-soft">Sin pedidos todavía.</p>
+      <?php else: ?>
+        <ul class="divide-y divide-silver-200">
+          <?php foreach ($recent as $o): ?>
+            <li class="flex items-center justify-between gap-3 px-5 py-3 hover:bg-silver">
+              <div class="min-w-0">
+                <p class="font-mono text-xs font-medium"><?= e($o['order_number']) ?></p>
+                <p class="truncate text-sm text-carbon-soft"><?= e($o['customer_name']) ?> · <?= (int)$o['item_count'] ?> prod.</p>
+              </div>
+              <div class="text-right">
+                <p class="font-semibold text-brand-700"><?= money((int)$o['total']) ?></p>
+                <p class="mt-1 flex items-center justify-end gap-2 text-xs">
+                  <span class="rounded-full px-2 py-0.5 font-medium <?= $STATUS_BADGE[$o['status']] ?? 'bg-silver' ?>">
+                    <?= e($STATUS_LABEL[$o['status']] ?? $o['status']) ?>
+                  </span>
+                  <span class="text-carbon-soft"><?= e(date('d M H:i', strtotime($o['created_at']))) ?></span>
+                </p>
+              </div>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      <?php endif; ?>
+    </section>
+
+    <!-- Stock bajo -->
+    <section class="rounded-xl border border-silver-200 bg-white">
+      <div class="flex items-center justify-between border-b border-silver-200 p-5">
+        <h2 class="font-semibold text-brand-700">Stock bajo o agotado</h2>
+        <a href="/admin/productos" class="text-sm font-medium text-brand-600 hover:underline">Ver productos →</a>
+      </div>
+      <?php if (empty($stats['low_stock'])): ?>
+        <p class="p-8 text-center text-sm text-carbon-soft inline-flex items-center justify-center gap-1.5"><?= icon('check', 'w-4 h-4 text-brand-600') ?> Todos los productos tienen stock suficiente.</p>
+      <?php else: ?>
+        <ul class="divide-y divide-silver-200">
+          <?php foreach ($stats['low_stock'] as $p): ?>
+            <?php $images = json_decode($p['images'] ?? '[]', true) ?: []; $img = $images[0] ?? null; ?>
+            <li>
+              <a href="/admin/productos/<?= e($p['id']) ?>" class="flex items-center justify-between gap-3 px-5 py-3 hover:bg-silver">
+                <div class="flex items-center gap-3 min-w-0">
+                  <?php if ($img): ?>
+                    <img src="<?= e($img) ?>" alt="" class="h-10 w-10 shrink-0 rounded object-cover">
+                  <?php else: ?>
+                    <div class="h-10 w-10 shrink-0 rounded bg-silver"></div>
+                  <?php endif; ?>
+                  <div class="min-w-0">
+                    <p class="truncate text-sm font-medium"><?= e($p['name']) ?></p>
+                    <p class="text-xs text-carbon-soft"><?= e($p['category_name']) ?></p>
+                  </div>
+                </div>
+                <span class="shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold <?= ((int)$p['stock'] === 0) ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-800' ?>">
+                  <?= ((int)$p['stock'] === 0) ? 'Agotado' : ((int)$p['stock'] . ' und') ?>
+                </span>
+              </a>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      <?php endif; ?>
+    </section>
+  </div>
+
+  <!-- Total + Alegra info -->
+  <div class="grid gap-6 lg:grid-cols-2">
+    <div class="rounded-xl border border-silver-200 bg-white p-6">
+      <h2 class="text-sm font-medium uppercase tracking-wide text-carbon-soft">Total ingresos histórico</h2>
+      <p class="mt-2 text-4xl font-bold text-brand-700"><?= money($totalRevenue) ?></p>
+      <p class="mt-1 text-xs text-carbon-soft">Suma de todos los pedidos pagados, enviados y entregados.</p>
+    </div>
+    <div class="rounded-xl border border-silver-200 bg-white p-6">
+      <h2 class="text-sm font-medium uppercase tracking-wide text-carbon-soft">Sincronización con Alegra</h2>
+      <p class="mt-2 text-2xl font-bold text-brand-700"><?= $alegraCount ?> productos</p>
+      <p class="mt-1 text-xs text-carbon-soft">
+        <?php if ($lastSync): ?>
+          Última sync: <?= e(date('d M Y, H:i', strtotime($lastSync))) ?>
+        <?php else: ?>
+          Aún sin sincronizar
+        <?php endif; ?>
+      </p>
+      <?php if (AlegraSync::isRunning()): ?>
+        <?php $started = AlegraSync::lockStartedAt(); ?>
+        <div class="mt-3 inline-flex items-center gap-2 rounded-full bg-amber-50 border border-amber-200 px-3 py-1 text-xs text-amber-900">
+          <span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+          Sync en curso (<?= $started ? max(0, time() - $started) : 0 ?>s)
+        </div>
+      <?php endif; ?>
+      <p class="mt-3 text-[11px] text-carbon-soft">
+        Se sincroniza automáticamente cada 30 minutos.
+      </p>
+      <form method="post" action="/admin/productos/sync" class="mt-3">
+        <?= csrf_field() ?>
+        <button class="inline-flex items-center gap-2 rounded-md bg-carbon px-4 py-2 text-sm font-semibold text-white hover:bg-carbon-soft transition">
+          <?= icon('refresh', 'w-4 h-4') ?> Sincronizar ahora
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

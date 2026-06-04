@@ -1,0 +1,120 @@
+<?php
+/** @var array  $logs */
+/** @var string $fromAddr */
+/** @var ?string $adminAddr */
+/** @var bool   $configured */
+
+$kindLabels = [
+    'order-pending-customer' => ['Pago pendiente → cliente', 'amber'],
+    'order-paid-customer'    => ['Pago confirmado → cliente', 'brand'],
+    'order-paid-owner'       => ['Nueva venta → dueña',       'blue'],
+    'test'                   => ['Test',                       'neutral'],
+    'generic'                => ['Otro',                       'neutral'],
+];
+$statusColors = [
+    'sent'    => 'bg-brand-100 text-brand-800',
+    'pending' => 'bg-amber-100 text-amber-800',
+    'failed'  => 'bg-red-100 text-red-800',
+];
+?>
+
+<div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+  <div>
+    <h1 class="brand-title text-2xl font-bold">Emails enviados</h1>
+    <p class="mt-1 text-sm text-carbon-soft">
+      Auditoría de cada correo que sale del sistema (cliente y dueña).
+    </p>
+  </div>
+  <form method="post" action="/admin/emails/test">
+    <?= csrf_field() ?>
+    <button class="inline-flex items-center gap-2 rounded-md bg-carbon text-white px-4 py-2 text-sm font-semibold hover:bg-carbon-soft transition">
+      <?= icon('mail', 'w-4 h-4') ?> Enviar test
+    </button>
+  </form>
+</div>
+
+<!-- Estado de configuración -->
+<div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+  <div class="rounded-xl border border-silver-200 bg-white p-4">
+    <p class="text-xs font-bold uppercase tracking-wider text-carbon-soft">RESEND</p>
+    <p class="mt-1 inline-flex items-center gap-1.5 font-semibold">
+      <?php if ($configured): ?>
+        <?= icon('check', 'w-4 h-4 text-brand-600') ?> <span class="text-brand-700">Configurado</span>
+      <?php else: ?>
+        <?= icon('x', 'w-4 h-4 text-red-600') ?> <span class="text-red-700">Falta RESEND_API_KEY</span>
+      <?php endif; ?>
+    </p>
+  </div>
+  <div class="rounded-xl border border-silver-200 bg-white p-4">
+    <p class="text-xs font-bold uppercase tracking-wider text-carbon-soft">FROM</p>
+    <p class="mt-1 font-mono text-[13px] truncate"><?= e($fromAddr) ?></p>
+  </div>
+  <div class="rounded-xl border border-silver-200 bg-white p-4">
+    <p class="text-xs font-bold uppercase tracking-wider text-carbon-soft">Admin recibe en</p>
+    <p class="mt-1 font-mono text-[13px] truncate"><?= e($adminAddr ?: '— (no configurado)') ?></p>
+  </div>
+</div>
+
+<?php if (str_contains($fromAddr, 'onboarding@resend.dev')): ?>
+  <div class="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+    <p class="font-bold inline-flex items-center gap-1.5"><?= icon('alert', 'w-4 h-4') ?> Modo sandbox de Resend</p>
+    <p class="mt-1 text-amber-900/90 leading-relaxed">
+      Estás usando <code>onboarding@resend.dev</code>. En este modo solo puedes enviar al email
+      con el que abriste la cuenta en Resend. Para enviar a clientes reales y a la dueña:
+      <a href="https://resend.com/domains" target="_blank" class="underline font-semibold">verifica un dominio</a>
+      y luego actualiza <code>EMAIL_FROM</code> en <code>.env</code>.
+    </p>
+  </div>
+<?php endif; ?>
+
+<!-- Tabla de logs -->
+<div class="rounded-xl border border-silver-200 bg-white overflow-hidden">
+  <?php if (empty($logs)): ?>
+    <div class="p-10 text-center">
+      <div class="mx-auto w-14 h-14 rounded-full bg-silver flex items-center justify-center text-carbon-soft mb-3"><?= icon('mail', 'w-6 h-6') ?></div>
+      <p class="text-sm text-carbon-soft">Aún no se ha enviado ningún email.</p>
+      <p class="mt-1 text-xs text-carbon-soft">Cuando un cliente haga un pedido, los registros aparecerán aquí.</p>
+    </div>
+  <?php else: ?>
+    <table class="w-full text-sm">
+      <thead class="bg-silver text-carbon-soft text-xs uppercase tracking-wider">
+        <tr>
+          <th class="text-left  px-4 py-3">Fecha</th>
+          <th class="text-left  px-4 py-3">Tipo</th>
+          <th class="text-left  px-4 py-3">Para</th>
+          <th class="text-left  px-4 py-3">Asunto</th>
+          <th class="text-left  px-4 py-3">Estado</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-silver-200">
+        <?php foreach ($logs as $l): ?>
+          <?php
+            $k = $kindLabels[$l['kind']] ?? [$l['kind'], 'neutral'];
+            $stCol = $statusColors[$l['status']] ?? 'bg-silver text-carbon-soft';
+          ?>
+          <tr class="hover:bg-silver/50">
+            <td class="px-4 py-3 whitespace-nowrap text-xs text-carbon-soft font-mono">
+              <?= e(date('d M H:i', strtotime($l['created_at']))) ?>
+            </td>
+            <td class="px-4 py-3 text-xs">
+              <span class="font-semibold"><?= e($k[0]) ?></span>
+              <?php if ($l['ref_id'] && $l['ref_type'] === 'order'): ?>
+                <span class="block text-[10px] text-carbon-soft font-mono mt-0.5"><?= e(substr($l['ref_id'], 0, 8)) ?>…</span>
+              <?php endif; ?>
+            </td>
+            <td class="px-4 py-3 text-xs font-mono truncate max-w-[200px]"><?= e($l['to_address']) ?></td>
+            <td class="px-4 py-3 text-xs truncate max-w-[300px]"><?= e($l['subject']) ?></td>
+            <td class="px-4 py-3">
+              <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold <?= e($stCol) ?>">
+                <?= e($l['status']) ?>
+              </span>
+              <?php if ($l['status'] === 'failed' && !empty($l['error'])): ?>
+                <p class="mt-1 text-[10px] text-red-700 max-w-[300px] line-clamp-2" title="<?= e($l['error']) ?>"><?= e($l['error']) ?></p>
+              <?php endif; ?>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+  <?php endif; ?>
+</div>

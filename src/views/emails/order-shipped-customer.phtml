@@ -1,0 +1,33 @@
+<?php
+/**
+ * Email al cliente cuando la dueña marca el pedido como ENVIADO.
+ * Vars: $order, $items, $shipping_method, $orderUrl
+ */
+$carrier  = $order['tracking_carrier'] ?? null;
+$tracking = $order['tracking_number']  ?? null;
+
+$headline = 'Tu pedido va en camino';
+$intro    = 'Acabamos de despachar tu pedido <strong>' . e($order['order_number']) . '</strong>. ';
+if (($order['shipping_method'] ?? '') === 'bus') {
+    $intro .= 'Recógelo presentando tu cédula en <strong>' . e($order['shipping_address']) . '</strong>.';
+} else {
+    $intro .= 'En las próximas horas el mensajero se contactará contigo para coordinar la entrega.';
+}
+
+ob_start();
+require __DIR__ . '/_partials/order-items.phtml';
+$bodyHtml  = (string) ob_get_clean();
+
+if ($carrier || $tracking) {
+    $bodyHtml .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:16px;border:1px solid #ececec;border-radius:10px;font-size:13px;">'
+      . '<tr><td style="padding:14px;color:#525a5e;line-height:1.6;">'
+      . '<strong style="color:#1a1d1f;text-transform:uppercase;font-size:11px;letter-spacing:0.06em;">Información de envío</strong><br>';
+    if ($carrier)  $bodyHtml .= 'Transportadora: <strong>' . e($carrier) . '</strong><br>';
+    if ($tracking) $bodyHtml .= 'Número de guía: <strong style="font-family:monospace;font-size:14px;">' . e($tracking) . '</strong>';
+    $bodyHtml .= '</td></tr></table>';
+}
+
+$cta    = ['label' => 'Ver mi pedido', 'url' => $orderUrl];
+$footer = 'Si tienes alguna duda con tu envío, escríbenos por WhatsApp y te ayudamos en seguida.';
+
+require __DIR__ . '/_partials/layout.phtml';

@@ -1,0 +1,17 @@
+<?php
+/**
+ * Email al cliente cuando se cancela el pedido.
+ * Vars: $order, $items
+ */
+$headline = 'Tu pedido fue cancelado';
+$intro    = 'El pedido <strong>' . e($order['order_number']) . '</strong> ha sido cancelado. Si pagaste por Wompi, te haremos la reversión en los próximos días hábiles.';
+
+ob_start();
+require __DIR__ . '/_partials/order-items.phtml';
+$bodyHtml  = (string) ob_get_clean();
+
+$cta    = null;
+$footer = 'Si crees que esto es un error o tienes dudas, escríbenos por WhatsApp y resolvemos.';
+$accent = '#525a5e';
+
+require __DIR__ . '/_partials/layout.phtml';

@@ -1,0 +1,162 @@
+<?php
+/** @var array $legal */
+require __DIR__ . '/_partials/layout.phtml';
+?>
+
+<p>
+  Esta política regula las devoluciones, reversiones de pago y reclamos de garantía de los productos
+  vendidos a través de <a href="https://<?= e($legal['domain']) ?>"><?= e($legal['domain']) ?></a>,
+  de conformidad con la <strong>Ley 1480 de 2011 (Estatuto del Consumidor)</strong> y el
+  <strong>Decreto 587 de 2016</strong>.
+</p>
+
+<h2>1. Derecho de retracto</h2>
+<p>
+  Conforme al <strong>artículo 47 de la Ley 1480 de 2011</strong>, el consumidor tiene derecho a
+  retractarse de la compra dentro de los <strong>cinco (5) días hábiles</strong> siguientes a la
+  fecha en que recibió el producto.
+</p>
+
+<h3>1.1 Requisitos para ejercer el retracto</h3>
+<ul>
+  <li>Que el producto se encuentre en <strong>perfectas condiciones</strong>, sin uso ni alteración.</li>
+  <li>Que conserve su <strong>empaque original</strong>, etiquetas, instructivos y demás accesorios.</li>
+  <li>Que no haya sido <strong>abierto, manipulado ni consumido parcial o totalmente</strong>.</li>
+  <li>Que la solicitud se haga dentro de los <strong>5 días hábiles</strong> contados desde la entrega.</li>
+</ul>
+
+<h3>1.2 Productos no susceptibles de retracto</h3>
+<p>
+  Por seguridad sanitaria y conforme al numeral 4 del artículo 47 de la Ley 1480, <strong>no aplica el
+  derecho de retracto</strong> sobre:
+</p>
+<ul>
+  <li>Productos veterinarios o suplementos que hayan sido <strong>abiertos</strong>, donde no se pueda
+      garantizar la integridad sanitaria.</li>
+  <li>Productos <strong>perecederos</strong> o cuya vigencia de consumo se haya iniciado.</li>
+  <li>Productos personalizados, hechos a la medida o sobre pedido.</li>
+</ul>
+
+<h3>1.3 Procedimiento</h3>
+<ol>
+  <li>Comunicar el retracto al correo <a href="mailto:<?= e($legal['email']) ?>"><?= e($legal['email']) ?></a>
+      o por WhatsApp al <a href="<?= e($legal['whatsapp']) ?>"><?= e($legal['phone']) ?></a> dentro
+      de los 5 días hábiles, indicando el número de pedido.</li>
+  <li>El cliente envía el producto a la dirección que le indiquemos, asumiendo los <strong>costos de
+      transporte</strong> del retorno (Ley 1480, artículo 47, parágrafo).</li>
+  <li>Una vez recibido y verificado el producto en buen estado, devolveremos el valor pagado dentro
+      de los <strong>treinta (30) días calendario</strong> siguientes, descontando los costos directos
+      de envío original si aplican.</li>
+</ol>
+
+<h2>2. Reversión de pago</h2>
+<p>
+  De acuerdo con el <strong>artículo 51 de la Ley 1480 de 2011</strong> y el
+  <strong>Decreto 587 de 2016</strong>, el consumidor podrá solicitar la reversión del pago en los
+  siguientes casos:
+</p>
+<ul>
+  <li>Cuando sea víctima de <strong>fraude</strong>.</li>
+  <li>Cuando la operación corresponda a una <strong>compra no solicitada</strong>.</li>
+  <li>Cuando el producto adquirido <strong>no sea recibido</strong>.</li>
+  <li>Cuando el producto entregado <strong>no corresponda a lo solicitado</strong> o sea defectuoso.</li>
+  <li>Cuando el producto haya sido <strong>devuelto en ejercicio del derecho de retracto</strong> y aplique reembolso.</li>
+</ul>
+
+<h3>2.1 Plazo y procedimiento</h3>
+<p>
+  El consumidor debe presentar la solicitud dentro de los <strong>cinco (5) días hábiles</strong>
+  siguientes a la fecha en que tuvo conocimiento de la operación fraudulenta, de la no recepción, o
+  de la entrega del producto defectuoso o no solicitado.
+</p>
+<p>
+  La solicitud debe presentarse simultáneamente:
+</p>
+<ol>
+  <li>Al comercio (<?= e($legal['name']) ?>) por los canales habituales de contacto.</li>
+  <li>Al emisor del medio de pago utilizado (banco, Wompi, etc.) para que inicie el procedimiento
+      de reversión.</li>
+</ol>
+<p>
+  La reversión se hará efectiva sobre el mismo medio de pago con el que se realizó la compra.
+</p>
+
+<h2>3. Garantía legal</h2>
+<p>
+  Según los artículos 7 y siguientes de la Ley 1480 de 2011, todo producto comercializado cuenta con
+  <strong>garantía legal de mínimo seis (6) meses</strong> a partir de la entrega, salvo que el
+  fabricante ofrezca un plazo mayor.
+</p>
+
+<h3>3.1 Qué cubre la garantía</h3>
+<ul>
+  <li>Defectos de fabricación o calidad.</li>
+  <li>Falta de correspondencia entre lo ofrecido y lo recibido.</li>
+  <li>Idoneidad y seguridad del producto.</li>
+</ul>
+
+<h3>3.2 Qué no cubre la garantía</h3>
+<ul>
+  <li>Daños por uso indebido o no seguir las instrucciones del fabricante.</li>
+  <li>Daños por <strong>almacenamiento inadecuado</strong> (exposición a sol directo, humedad excesiva, etc.).</li>
+  <li>Productos vencidos o consumidos pasada su fecha de vencimiento.</li>
+  <li>Daños causados por terceros o fuerza mayor.</li>
+</ul>
+
+<h3>3.3 Cómo activar la garantía</h3>
+<ol>
+  <li>Contactar a <?= e($legal['name']) ?> por correo o WhatsApp dentro del periodo de garantía.</li>
+  <li>Adjuntar número de pedido, fotos o video del defecto y descripción del problema.</li>
+  <li>Recibirá respuesta en máximo <strong>15 días hábiles</strong> con la solución (reparación,
+      reposición, devolución del dinero) según lo previsto en el artículo 11 de la Ley 1480.</li>
+</ol>
+
+<h2>4. Reembolsos</h2>
+<p>
+  Cuando aplique reembolso (retracto, reversión, garantía con devolución del dinero), este se hará:
+</p>
+<ul>
+  <li>Sobre el <strong>mismo medio de pago</strong> utilizado en la compra original.</li>
+  <li>En un plazo máximo de <strong>treinta (30) días calendario</strong> en caso de retracto.</li>
+  <li>En el plazo definido por el emisor del medio de pago en caso de reversión por Wompi (usualmente
+      5 a 15 días hábiles).</li>
+</ul>
+
+<h2>5. Productos dañados durante el transporte</h2>
+<p>
+  Si el producto llega con daños visibles causados por el transporte, el cliente debe:
+</p>
+<ol>
+  <li><strong>Rechazar el paquete</strong> al mensajero si los daños son evidentes en el momento de la entrega; o</li>
+  <li><strong>Reportar el daño dentro de las primeras 24 horas</strong> de recibido, con fotos del paquete
+      y del producto, al correo o WhatsApp.</li>
+</ol>
+<p>
+  Una vez verificado, procederemos a la reposición sin costo adicional o al reembolso del valor pagado.
+</p>
+
+<h2>6. Productos faltantes o equivocados</h2>
+<p>
+  Si el pedido recibido no corresponde con lo solicitado (productos faltantes, equivocados, cantidades
+  distintas), debe reportarlo dentro de las <strong>48 horas hábiles</strong> siguientes a la recepción.
+  Procederemos a enviar el faltante o realizar la corrección sin costo para el cliente.
+</p>
+
+<h2>7. Canales de atención</h2>
+<ul>
+  <li>Correo: <a href="mailto:<?= e($legal['email']) ?>"><?= e($legal['email']) ?></a></li>
+  <li>WhatsApp: <a href="<?= e($legal['whatsapp']) ?>"><?= e($legal['phone']) ?></a></li>
+  <li>Horario de atención: lunes a viernes de 8:00 a 18:00, sábados de 9:00 a 13:00.</li>
+</ul>
+
+<h2>8. Instancias de protección al consumidor</h2>
+<p>
+  Si considera que sus derechos como consumidor han sido vulnerados, puede acudir a:
+</p>
+<ul>
+  <li><strong>Superintendencia de Industria y Comercio (SIC)</strong> —
+      <a href="https://www.sic.gov.co" target="_blank" rel="noopener">www.sic.gov.co</a></li>
+  <li><strong>Línea gratuita nacional:</strong> 01-8000-910165</li>
+</ul>
+
+<?php require __DIR__ . '/_partials/layout-end.phtml'; ?>

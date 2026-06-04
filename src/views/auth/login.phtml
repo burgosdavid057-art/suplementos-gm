@@ -1,0 +1,41 @@
+<?php /** @var string $title */ ?>
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title><?= e($title) ?></title>
+<link rel="icon" type="image/png" sizes="32x32"  href="/assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/tailwind.css">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body class="min-h-screen grid place-items-center bg-silver text-carbon px-4">
+<div class="w-full max-w-sm">
+  <a href="/" class="flex items-center justify-center mb-8">
+    <img src="/assets/logo-gm.png" alt="Suplementos GM" class="brand-logo-login">
+  </a>
+
+  <form method="post" action="/admin/login" class="bg-white rounded-2xl shadow-xl border border-silver-200 p-8">
+    <h1 class="text-xl font-bold mb-1">Acceso administrador</h1>
+    <p class="text-sm text-carbon-soft mb-5">Ingresa tus credenciales para continuar.</p>
+
+    <?php if ($f = flash('err')): ?>
+      <div class="mb-4 text-sm rounded-lg bg-red-50 border border-red-200 text-red-900 px-3 py-2"><?= e($f) ?></div>
+    <?php endif; ?>
+
+    <?= csrf_field() ?>
+    <label class="block text-xs font-bold uppercase tracking-wider text-carbon-soft mb-1.5" for="email">Email</label>
+    <input id="email" type="email" name="email" required autofocus
+           class="w-full mb-4 rounded-lg border border-silver-200 px-3 py-2.5 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20">
+
+    <label class="block text-xs font-bold uppercase tracking-wider text-carbon-soft mb-1.5" for="password">Contraseña</label>
+    <input id="password" type="password" name="password" required
+           class="w-full mb-6 rounded-lg border border-silver-200 px-3 py-2.5 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20">
+
+    <button class="w-full h-11 rounded-md bg-carbon text-white font-semibold hover:bg-carbon-soft transition">
+      Entrar →
+    </button>
+  </form>
+  <a href="/" class="block text-center mt-5 text-xs text-carbon-soft hover:text-brand-600">← Volver a la tienda</a>
+</div>
+</body></html>

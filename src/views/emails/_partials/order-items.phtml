@@ -1,0 +1,56 @@
+<?php
+/**
+ * Renderiza la tabla de items + totales de un pedido.
+ * @var array $order
+ * @var array $items
+ * @var ?array $shipping_method
+ */
+?>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #ececec;border-radius:10px;overflow:hidden;font-size:14px;">
+  <thead>
+    <tr>
+      <th align="left"  style="background:#f5f6f7;padding:10px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#8a929a;border-bottom:1px solid #ececec;">Producto</th>
+      <th align="right" style="background:#f5f6f7;padding:10px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#8a929a;border-bottom:1px solid #ececec;">Subtotal</th>
+    </tr>
+  </thead>
+  <tbody>
+    <?php foreach ($items as $it): ?>
+      <tr>
+        <td style="padding:11px 14px;border-bottom:1px solid #f5f5f5;color:#1a1d1f;">
+          <?= e($it['product_name']) ?>
+          <span style="color:#8a929a;">×<?= (int)$it['quantity'] ?></span>
+        </td>
+        <td align="right" style="padding:11px 14px;border-bottom:1px solid #f5f5f5;color:#1a1d1f;font-variant-numeric:tabular-nums;">
+          <?= e(money((int)$it['subtotal'])) ?>
+        </td>
+      </tr>
+    <?php endforeach; ?>
+
+    <tr>
+      <td align="right" style="padding:10px 14px;color:#525a5e;">Subtotal</td>
+      <td align="right" style="padding:10px 14px;color:#1a1d1f;font-variant-numeric:tabular-nums;"><?= e(money((int)$order['subtotal'])) ?></td>
+    </tr>
+    <tr>
+      <td align="right" style="padding:6px 14px;color:#525a5e;">
+        Envío<?php if (!empty($shipping_method)): ?> <span style="color:#8a929a;">· <?= e($shipping_method['name'] ?? '') ?></span><?php endif; ?>
+      </td>
+      <td align="right" style="padding:6px 14px;color:#1a1d1f;font-variant-numeric:tabular-nums;">
+        <?= ((int)$order['shipping_cost'] === 0) ? 'Gratis' : e(money((int)$order['shipping_cost'])) ?>
+      </td>
+    </tr>
+    <tr>
+      <td align="right" style="padding:14px;background:#f5fbf5;font-weight:800;color:#1a1d1f;font-size:15px;">Total</td>
+      <td align="right" style="padding:14px;background:#f5fbf5;font-weight:800;color:#28b22e;font-size:17px;font-variant-numeric:tabular-nums;">
+        <?= e(money((int)$order['total'])) ?>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<?php if (!empty($shipping_method)): ?>
+  <p style="margin:14px 0 0 0;font-size:13px;line-height:1.5;color:#525a5e;">
+    <strong style="color:#1a1d1f;"><?= e($shipping_method['name']) ?></strong><br>
+    <?= e($shipping_method['description'] ?? '') ?><br>
+    <strong>Tiempo estimado:</strong> <?= e($shipping_method['eta_label'] ?? '—') ?>
+  </p>
+<?php endif; ?>

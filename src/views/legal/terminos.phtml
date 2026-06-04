@@ -1,0 +1,179 @@
+<?php
+/** @var array $legal */
+require __DIR__ . '/_partials/layout.phtml';
+?>
+
+<h2>1. Identificación del proveedor</h2>
+<p>
+  <strong><?= e($legal['name']) ?></strong>, identificado con <?= e($legal['doc_type']) ?>
+  <strong><?= e($legal['doc_id']) ?></strong>, con domicilio principal en <?= e($legal['address']) ?>,
+  pone a disposición de los consumidores la tienda virtual <a href="https://<?= e($legal['domain']) ?>"><?= e($legal['domain']) ?></a>
+  (en adelante, "la Tienda").
+</p>
+<p>
+  Datos de contacto:
+</p>
+<ul>
+  <li>Correo electrónico: <a href="mailto:<?= e($legal['email']) ?>"><?= e($legal['email']) ?></a></li>
+  <li>WhatsApp / teléfono: <a href="<?= e($legal['whatsapp']) ?>"><?= e($legal['phone']) ?></a></li>
+</ul>
+
+<h2>2. Aceptación de los términos</h2>
+<p>
+  Al usar la Tienda y/o realizar una compra, el usuario manifiesta haber leído, entendido y aceptado
+  estos Términos y Condiciones, junto con la <a href="/legal/privacidad">Política de Privacidad</a>
+  y la <a href="/legal/devoluciones">Política de Devoluciones y Reversión de Pago</a>.
+</p>
+<p>
+  Si no está de acuerdo con cualquier disposición de este documento, debe abstenerse de utilizar la Tienda.
+</p>
+
+<h2>3. Productos y precios</h2>
+<p>
+  Comercializamos suplementos nutricionales, insumos veterinarios y productos relacionados con el cuidado
+  equino. Los productos se ofrecen únicamente para uso animal, principalmente equinos.
+</p>
+<p>
+  Los precios se expresan en <strong>pesos colombianos (COP)</strong> e incluyen el IVA cuando aplica.
+  Los precios pueden cambiar sin previo aviso. El precio aplicable a una compra es el vigente al
+  momento de finalizar el pedido (checkout).
+</p>
+<p>
+  La disponibilidad de los productos depende del inventario en tiempo real. En caso de que un producto
+  aparezca como disponible pero se agote antes de procesar el pedido, contactaremos al cliente para
+  ofrecer reposición, sustitución o reversión del pago.
+</p>
+
+<h2>4. Proceso de compra</h2>
+<ol>
+  <li>El usuario selecciona los productos y los añade al carrito.</li>
+  <li>En el checkout, ingresa sus datos personales y de facturación (obligatorios para emisión de factura electrónica).</li>
+  <li>Elige uno de los tres métodos de envío disponibles.</li>
+  <li>Paga con tarjeta de crédito, débito, PSE o Nequi a través de la pasarela Wompi, o coordina pago contra entrega cuando aplica.</li>
+  <li>Recibe confirmación al correo registrado y puede consultar el estado en
+    <a href="/orden">/orden</a> con su número de pedido.</li>
+</ol>
+
+<h2>5. Medios de pago</h2>
+<p>
+  Los pagos electrónicos son procesados por <strong>Wompi S.A.S.</strong>, plataforma autorizada por
+  la Superintendencia Financiera de Colombia. <?= e($legal['name']) ?> no almacena información de
+  tarjetas de crédito ni cuentas bancarias.
+</p>
+<p>
+  Para el método "InterRapidísimo Pago Contra Entrega (PCE)", el cliente paga el valor total del pedido
+  directamente al mensajero al recibirlo. En este caso no hay cargo previo y la reserva del pedido tiene
+  vigencia de 24 horas hábiles.
+</p>
+
+<h2>6. Envíos y tiempos de entrega</h2>
+<p>Operamos tres modalidades de envío:</p>
+<ul>
+  <li><strong>InterRapidísimo PCE</strong> — entrega a domicilio en todo el territorio nacional.
+      Pago al recibir. Tiempo estimado: <strong>2 a 5 días hábiles</strong>.</li>
+  <li><strong>Envío por bus a Terminal de Medellín</strong> — costo $15.000. El cliente recoge la
+      encomienda en la Terminal del Norte o del Sur de Medellín presentando su cédula. Tiempo estimado:
+      <strong>1 a 2 días hábiles</strong>.</li>
+  <li><strong>Oriente Antioqueño Cercano</strong> — costo $10.000. Entrega local en Rionegro, La Ceja,
+      El Carmen, El Retiro y Llanogrande. Mismo día o siguiente.</li>
+</ul>
+<p>
+  Los tiempos son estimados y dependen de la transportadora y la ubicación. No incluyen sábados, domingos
+  ni festivos. En caso de retraso significativo, se informará al cliente vía WhatsApp o correo.
+</p>
+
+<h2>7. Garantía legal</h2>
+<p>
+  En cumplimiento del artículo 7 y siguientes de la Ley 1480 de 2011 (Estatuto del Consumidor),
+  todos los productos cuentan con <strong>garantía legal de seis (6) meses</strong> a partir de la
+  fecha de entrega, salvo que el fabricante ofrezca una garantía mayor.
+</p>
+<p>
+  La garantía cubre defectos de fabricación, calidad o idoneidad del producto. <strong>No cubre</strong>
+  daños causados por mal uso, almacenamiento inadecuado, alteración del producto o consumo después de
+  la fecha de vencimiento.
+</p>
+<p>
+  Para hacer efectiva la garantía, el cliente debe contactarnos por correo o WhatsApp aportando el
+  número de pedido y evidencia (fotos, video) del defecto.
+</p>
+
+<h2>8. Derecho de retracto</h2>
+<p>
+  Conforme al artículo 47 de la Ley 1480 de 2011, el consumidor tiene derecho a retractarse de la
+  compra dentro de los <strong>cinco (5) días hábiles</strong> siguientes a la entrega del producto,
+  siempre que:
+</p>
+<ul>
+  <li>El producto no haya sido abierto, usado ni alterado.</li>
+  <li>Esté en perfectas condiciones, con su empaque original y etiquetas.</li>
+  <li>Los costos de devolución sean asumidos por el consumidor.</li>
+</ul>
+<p>
+  El procedimiento detallado está en la <a href="/legal/devoluciones">Política de Devoluciones</a>.
+</p>
+
+<h2>9. Reversión de pago</h2>
+<p>
+  De acuerdo con el artículo 51 de la Ley 1480 de 2011 y el Decreto 587 de 2016, el consumidor podrá
+  solicitar la reversión del pago cuando:
+</p>
+<ul>
+  <li>Sea víctima de fraude.</li>
+  <li>La operación corresponda a una compra no solicitada.</li>
+  <li>El producto no sea recibido o no corresponda a lo solicitado.</li>
+  <li>El producto presente defectos.</li>
+</ul>
+<p>
+  La solicitud debe presentarse dentro de los <strong>cinco (5) días hábiles</strong> siguientes a la
+  fecha en que se tuvo conocimiento del hecho. La reversión se hará efectiva sobre el medio de pago
+  utilizado en la compra.
+</p>
+
+<h2>10. Uso veterinario y advertencias</h2>
+<p>
+  Los productos ofrecidos son de uso veterinario y no humano. Antes de administrar cualquier suplemento
+  o medicamento veterinario, se recomienda consultar con un médico veterinario o zootecnista. Suplementos
+  GM no se hace responsable por el uso inadecuado de los productos ni por reacciones adversas derivadas
+  de no seguir las instrucciones del fabricante.
+</p>
+
+<h2>11. Propiedad intelectual</h2>
+<p>
+  Todos los contenidos de la Tienda (imágenes, textos, marca, logotipo, diseño) son propiedad de
+  <?= e($legal['name']) ?> o de sus respectivos titulares y están protegidos por las normas de
+  propiedad intelectual. Queda prohibida su reproducción total o parcial sin autorización escrita.
+</p>
+
+<h2>12. Limitación de responsabilidad</h2>
+<p>
+  <?= e($legal['name']) ?> se compromete a brindar la información más precisa posible. Sin embargo,
+  no garantiza que la Tienda esté libre de errores ni que el servicio sea ininterrumpido. Tampoco
+  responde por daños indirectos derivados del uso o la imposibilidad de uso del sitio.
+</p>
+
+<h2>13. Modificaciones</h2>
+<p>
+  <?= e($legal['name']) ?> se reserva el derecho de modificar estos Términos y Condiciones en
+  cualquier momento. Las modificaciones entran en vigencia desde su publicación en la Tienda.
+  Recomendamos al usuario revisar este documento periódicamente.
+</p>
+
+<h2>14. Ley aplicable y jurisdicción</h2>
+<p>
+  Estos Términos y Condiciones se rigen por las leyes de la República de Colombia. Cualquier
+  controversia derivada de la relación comercial será resuelta ante los jueces competentes de
+  Rionegro, Antioquia, salvo que el consumidor opte por las acciones de protección al consumidor
+  ante la Superintendencia de Industria y Comercio.
+</p>
+
+<h2>15. Contacto</h2>
+<p>
+  Cualquier consulta, queja o reclamo puede dirigirse a:
+</p>
+<ul>
+  <li>Correo: <a href="mailto:<?= e($legal['email']) ?>"><?= e($legal['email']) ?></a></li>
+  <li>WhatsApp: <a href="<?= e($legal['whatsapp']) ?>"><?= e($legal['phone']) ?></a></li>
+</ul>
+
+<?php require __DIR__ . '/_partials/layout-end.phtml'; ?>

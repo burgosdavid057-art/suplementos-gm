@@ -1,0 +1,275 @@
+<?php
+/** @var array $categories */
+/** @var ?array $product */
+/** @var array $errors */
+/** @var array $old */
+
+$isNew = !$product;
+$action = $isNew ? '/admin/productos/nuevo' : '/admin/productos/' . $product['id'];
+
+// Valores: prioridad old (después de error) > product (edición) > vacío
+function val($key, $old, $product, $default = '') {
+    if (isset($old[$key])) return $old[$key];
+    if ($product && isset($product[$key])) return $product[$key];
+    return $default;
+}
+
+$initialImages = [];
+if (isset($old['images']) && is_array($old['images'])) {
+    $initialImages = $old['images'];
+} elseif ($product) {
+    $initialImages = $product['images'];
+}
+?>
+
+<div class="mb-6">
+  <a href="/admin/productos" class="text-sm text-carbon-soft hover:text-brand-600">← Volver a productos</a>
+  <h1 class="brand-title text-3xl font-bold mt-2"><?= $isNew ? 'Nuevo producto' : e($product['name']) ?></h1>
+  <?php if (!$isNew && !empty($product['alegra_id'])): ?>
+    <p class="mt-1 text-sm text-carbon-soft">
+      Sincronizado con Alegra (id: <code class="text-xs"><?= e($product['alegra_id']) ?></code>).
+      El precio, stock, descripción e imágenes se sobreescriben en cada sync.
+      Marca "🔒 Bloquear imágenes" si quieres conservar fotos propias.
+    </p>
+  <?php endif; ?>
+</div>
+
+<form method="post" action="<?= e($action) ?>" class="space-y-6">
+  <?= csrf_field() ?>
+
+  <?php if (!empty($errors)): ?>
+    <div class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+      Revisa los campos marcados.
+    </div>
+  <?php endif; ?>
+
+  <input type="hidden" id="images-input" name="images" value="<?= e(implode("\n", $initialImages)) ?>">
+
+  <div class="grid gap-6 lg:grid-cols-3">
+    <!-- Columna principal -->
+    <div class="space-y-5 lg:col-span-2">
+      <div>
+        <label class="block text-sm font-semibold mb-1">Nombre</label>
+        <input id="name" name="name" required value="<?= e(val('name', $old, $product)) ?>"
+               class="w-full rounded-lg border border-silver-200 px-3 py-2.5 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20">
+        <?php if (isset($errors['name'])): ?><p class="mt-1 text-xs text-red-600"><?= e($errors['name']) ?></p><?php endif; ?>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold mb-1">Slug (URL)</label>
+        <input id="slug" name="slug" required value="<?= e(val('slug', $old, $product)) ?>"
+               class="w-full rounded-lg border border-silver-200 px-3 py-2.5 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20">
+        <p class="mt-1 text-xs text-carbon-soft">Se autogenera del nombre. Solo edítalo si sabes lo que haces.</p>
+        <?php if (isset($errors['slug'])): ?><p class="mt-1 text-xs text-red-600"><?= e($errors['slug']) ?></p><?php endif; ?>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold mb-1">Marca</label>
+        <input name="brand" value="<?= e(val('brand', $old, $product)) ?>"
+               class="w-full rounded-lg border border-silver-200 px-3 py-2.5 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20">
+        <p class="mt-1 text-xs text-carbon-soft">Ej: Curragh, Aifit, Equimax. Para los filtros del catálogo.</p>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold mb-1">Descripción</label>
+        <textarea name="description" required rows="6"
+                  class="w-full rounded-lg border border-silver-200 px-3 py-2.5 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"><?= e(val('description', $old, $product)) ?></textarea>
+        <?php if (isset($errors['description'])): ?><p class="mt-1 text-xs text-red-600"><?= e($errors['description']) ?></p><?php endif; ?>
+      </div>
+
+      <!-- Uploader de imágenes -->
+      <div>
+        <label class="block text-sm font-semibold mb-1">Imágenes</label>
+        <div id="image-list" class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3"></div>
+        <div class="flex flex-wrap gap-2">
+          <?php if (Cloudinary::isConfigured()): ?>
+            <button type="button" id="btn-upload"
+                    class="inline-flex items-center gap-2 rounded-md border border-silver-200 bg-white px-4 py-2 text-sm font-medium hover:border-brand-500 hover:text-brand-600 transition">
+              📷 Subir imagen (Cloudinary)
+            </button>
+          <?php endif; ?>
+          <button type="button" id="btn-add-url"
+                  class="inline-flex items-center gap-2 rounded-md border border-silver-200 bg-white px-4 py-2 text-sm font-medium hover:border-brand-500 hover:text-brand-600 transition">
+            🔗 Pegar URL
+          </button>
+        </div>
+        <p class="mt-2 text-xs text-carbon-soft">Primera imagen = imagen principal. Arrastra para reordenar.</p>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="space-y-5">
+      <div class="rounded-xl border border-silver-200 bg-white p-5">
+        <h3 class="font-semibold text-brand-700 mb-3">Estado</h3>
+        <label class="flex items-start gap-3 text-sm cursor-pointer">
+          <input type="checkbox" name="active" <?= !empty(val('active', $old, $product, true)) ? 'checked' : '' ?>
+                 class="mt-1 h-4 w-4 accent-brand-500">
+          <span>
+            <span class="font-medium block">Activo</span>
+            <span class="text-xs text-carbon-soft">Visible en la tienda</span>
+          </span>
+        </label>
+        <label class="mt-3 flex items-start gap-3 text-sm cursor-pointer">
+          <input type="checkbox" name="featured" <?= !empty(val('featured', $old, $product)) ? 'checked' : '' ?>
+                 class="mt-1 h-4 w-4 accent-brand-500">
+          <span>
+            <span class="font-medium block">Destacado</span>
+            <span class="text-xs text-carbon-soft">Aparece en home y primero</span>
+          </span>
+        </label>
+        <?php if (!$isNew && !empty($product['alegra_id'])): ?>
+        <label class="mt-3 flex items-start gap-3 text-sm cursor-pointer border-t border-silver-200 pt-3">
+          <input type="checkbox" name="images_locked" <?= !empty(val('images_locked', $old, $product)) ? 'checked' : '' ?>
+                 class="mt-1 h-4 w-4 accent-brand-500">
+          <span>
+            <span class="font-medium block">🔒 Bloquear imágenes</span>
+            <span class="text-xs text-carbon-soft">No sincronizar fotos desde Alegra (usa las de aquí)</span>
+          </span>
+        </label>
+        <?php endif; ?>
+      </div>
+
+      <div class="rounded-xl border border-silver-200 bg-white p-5">
+        <h3 class="font-semibold text-brand-700 mb-3">Precio y stock</h3>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">Precio (COP)</label>
+            <input type="number" name="price" required min="0" step="1000" value="<?= e((string)val('price', $old, $product, 0)) ?>"
+                   class="w-full rounded-lg border border-silver-200 px-3 py-2 focus:border-brand-500 focus:outline-none">
+            <?php if (isset($errors['price'])): ?><p class="mt-1 text-xs text-red-600"><?= e($errors['price']) ?></p><?php endif; ?>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Stock</label>
+            <input type="number" name="stock" required min="0" value="<?= e((string)val('stock', $old, $product, 0)) ?>"
+                   class="w-full rounded-lg border border-silver-200 px-3 py-2 focus:border-brand-500 focus:outline-none">
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-silver-200 bg-white p-5">
+        <h3 class="font-semibold text-brand-700 mb-3">Categoría</h3>
+        <select name="category_id" required class="w-full rounded-lg border border-silver-200 px-3 py-2 focus:border-brand-500 focus:outline-none">
+          <option value="">— Selecciona —</option>
+          <?php foreach ($categories as $c): ?>
+            <option value="<?= e($c['id']) ?>" <?= val('category_id', $old, $product) === $c['id'] ? 'selected' : '' ?>>
+              <?= e($c['name']) ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+        <?php if (isset($errors['category_id'])): ?><p class="mt-1 text-xs text-red-600"><?= e($errors['category_id']) ?></p><?php endif; ?>
+      </div>
+    </aside>
+  </div>
+
+  <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-silver-200">
+    <a href="/admin/productos" class="text-sm text-carbon-soft hover:text-brand-600">← Cancelar</a>
+    <button class="inline-flex items-center gap-2 rounded-md bg-brand-500 px-6 py-2.5 font-semibold text-white shadow-md shadow-brand-500/30 hover:bg-brand-600 transition">
+      <?= $isNew ? 'Crear producto' : 'Guardar cambios' ?>
+    </button>
+  </div>
+</form>
+
+<script>
+// ─── Auto-slug ──────────────────────────────────────────
+function slugify(s) {
+  return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+}
+const nameEl = document.getElementById('name');
+const slugEl = document.getElementById('slug');
+let slugTouched = <?= $isNew ? 'false' : 'true' ?>;
+slugEl.addEventListener('input', () => { slugTouched = true; });
+nameEl.addEventListener('input', () => {
+  if (!slugTouched) slugEl.value = slugify(nameEl.value);
+});
+
+// ─── Image manager ──────────────────────────────────────
+const cloudName    = <?= json_encode(Cloudinary::cloudName()) ?>;
+const uploadPreset = <?= json_encode(Cloudinary::uploadPreset()) ?>;
+const imagesInput  = document.getElementById('images-input');
+const imageList    = document.getElementById('image-list');
+
+function readImages() {
+  const v = imagesInput.value.trim();
+  return v ? v.split('\n').filter(Boolean) : [];
+}
+function writeImages(arr) {
+  imagesInput.value = arr.join('\n');
+  renderImages();
+}
+function renderImages() {
+  const arr = readImages();
+  imageList.innerHTML = '';
+  if (arr.length === 0) {
+    imageList.innerHTML = '<div class="col-span-full text-xs text-carbon-soft p-4 border border-dashed border-silver-200 rounded-lg text-center">Sin imágenes</div>';
+    return;
+  }
+  arr.forEach((url, i) => {
+    const card = document.createElement('div');
+    card.className = 'relative group rounded-lg overflow-hidden border border-silver-200 aspect-square';
+    card.innerHTML = `
+      <img src="${url}" class="w-full h-full object-cover">
+      ${i === 0 ? '<span class="absolute top-1 left-1 bg-brand-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">Principal</span>' : ''}
+      <div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100">
+        ${i > 0 ? `<button type="button" data-act="up" data-i="${i}" class="bg-white text-xs px-2 py-1 rounded">←</button>` : ''}
+        ${i < arr.length-1 ? `<button type="button" data-act="down" data-i="${i}" class="bg-white text-xs px-2 py-1 rounded">→</button>` : ''}
+        <button type="button" data-act="del" data-i="${i}" class="bg-red-600 text-white text-xs px-2 py-1 rounded">✕</button>
+      </div>
+    `;
+    imageList.appendChild(card);
+  });
+}
+imageList.addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-act]');
+  if (!btn) return;
+  const i = parseInt(btn.dataset.i);
+  const arr = readImages();
+  if (btn.dataset.act === 'del') arr.splice(i, 1);
+  if (btn.dataset.act === 'up' && i > 0) [arr[i-1], arr[i]] = [arr[i], arr[i-1]];
+  if (btn.dataset.act === 'down' && i < arr.length-1) [arr[i], arr[i+1]] = [arr[i+1], arr[i]];
+  writeImages(arr);
+});
+
+// Pegar URL
+document.getElementById('btn-add-url').addEventListener('click', () => {
+  const url = prompt('Pega la URL de la imagen:');
+  if (!url) return;
+  const arr = readImages();
+  arr.push(url.trim());
+  writeImages(arr);
+});
+
+// Upload Cloudinary (widget oficial)
+const btnUpload = document.getElementById('btn-upload');
+if (btnUpload) {
+  btnUpload.addEventListener('click', () => {
+    if (!window.cloudinary) {
+      alert('El widget de Cloudinary aún no cargó. Espera un segundo y vuelve a intentar.');
+      return;
+    }
+    const widget = window.cloudinary.createUploadWidget({
+      cloudName, uploadPreset,
+      sources: ['local','url','camera'],
+      multiple: true,
+      maxFiles: 6,
+      cropping: false,
+      language: 'es',
+      text: { es: { menu: { files: 'Mis archivos', web: 'Pegar URL' } } },
+    }, (err, result) => {
+      if (err) { console.error(err); return; }
+      if (result && result.event === 'success') {
+        const arr = readImages();
+        arr.push(result.info.secure_url);
+        writeImages(arr);
+      }
+    });
+    widget.open();
+  });
+}
+
+renderImages();
+</script>
+
+<?php if (Cloudinary::isConfigured()): ?>
+<script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+<?php endif; ?>

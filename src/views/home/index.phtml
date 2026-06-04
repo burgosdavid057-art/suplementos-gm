@@ -1,0 +1,351 @@
+<?php
+/** @var array $featured */
+/** @var array $categories */
+/** @var ?array $flagship */
+
+$HERO_HORSE     = 'https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=2000&q=85&auto=format&fit=crop';
+$FIELD_HORSE    = 'https://images.unsplash.com/photo-1598974357801-cbca100e65d3?w=1400&q=85&auto=format&fit=crop';
+$FIELD_LANDSCAPE= 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=80&auto=format&fit=crop';
+
+$CATEGORY_ICONS = [
+    'vitaminas-minerales'  => 'pill',
+    'articulaciones'       => 'bone',
+    'energia-resistencia'  => 'zap',
+    'digestivos'           => 'leaf',
+    'insumos-veterinarios' => 'stethoscope',
+    'bodybuilder'          => 'muscle',
+    'recuperacion'         => 'recycle',
+    'protectores'          => 'shield',
+    'cascos'               => 'horseshoe',
+    'marca-propia'         => 'star',
+    'ventas'               => 'tag',
+];
+
+$TRUST_BADGES = [
+    ['icon' => 'truck',        'title' => 'Pago contraentrega',    'text' => 'Te lo enviamos por InterRapidísimo y le pagas al mensajero al recibir'],
+    ['icon' => 'stethoscope',  'title' => 'Asesoría veterinaria',  'text' => 'Te ayudamos a elegir el producto correcto para tu caballo'],
+    ['icon' => 'lock',         'title' => 'Pago 100% seguro',      'text' => 'PSE, Nequi o tarjeta vía Wompi con cifrado bancario'],
+    ['icon' => 'check',        'title' => 'Productos certificados','text' => 'Importados y avalados por médicos veterinarios'],
+];
+?>
+
+<!-- ─── HERO con foto ecuestre + logo en silla ──────── -->
+<section class="hero-section relative overflow-hidden text-white">
+
+  <!-- Foto: caballos en pradera + silla con logo GM -->
+  <div aria-hidden="true" class="hero-photo"></div>
+
+  <!-- Overlay degradado para legibilidad del texto -->
+  <div aria-hidden="true" class="hero-overlay"></div>
+
+  <!-- Fade inferior para conectar con la galloping band (que empieza con #2a1410) -->
+  <div aria-hidden="true" class="absolute inset-x-0 bottom-0 h-24 md:h-32 pointer-events-none z-[3]"
+       style="background:linear-gradient(180deg, transparent 0%, rgba(42,20,16,.75) 65%, #2a1410 100%);"></div>
+
+  <!-- Contenido -->
+  <div class="hero-content relative z-[4] mx-auto max-w-6xl px-5 sm:px-6">
+    <div class="max-w-xl">
+      <p data-anim-hero class="hero-eyebrow">
+        <span class="hero-eyebrow-dot"></span>
+        Suplementos e insumos veterinarios
+      </p>
+      <h1 data-anim-hero class="hero-title">
+        <span class="hero-title-brand">Suplementos GM</span>
+        <span class="hero-title-tag">¡Una pasión<br>que nos une!</span>
+      </h1>
+      <p data-anim-hero class="hero-desc">
+        Productos seleccionados para fuerza, recuperación, cascos y bienestar de tu caballo.
+        Atendemos criadores, jinetes y veterinarios en toda Colombia.
+      </p>
+      <div data-anim-hero class="hero-cta">
+        <a href="/productos" class="hero-btn-primary">
+          Ver productos
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="animate-gallop">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+        <a href="https://wa.me/573105043520" target="_blank" rel="noreferrer" class="hero-btn-ghost">
+          Asesoría por WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ─── Banda decorativa: caballo galopando con scroll ─── -->
+<section aria-hidden="true" class="galloping-band" data-galloping-band>
+  <div class="galloping-track"></div>
+  <div class="galloping-track" style="bottom:2.65rem; opacity:.5"></div>
+
+  <div class="galloping-dust">
+    <span style="left:10%; top:55%"></span>
+    <span style="left:22%; top:62%"></span>
+    <span style="left:38%; top:58%"></span>
+    <span style="left:55%; top:64%"></span>
+    <span style="left:70%; top:56%"></span>
+    <span style="left:85%; top:60%"></span>
+  </div>
+
+  <div class="galloping-trail" data-galloping-trail style="left:-25%; width:30%;"></div>
+
+  <div class="galloping-horse" data-galloping-horse style="left:-20%;">
+    <div class="animate-hoof-bounce">
+      <!-- height inline (con var) para que ningún reset (Tailwind preflight) lo sobrescriba.
+           El --horse-h se define en .galloping-band con media query para desktop. -->
+      <img src="/assets/caballo-galopante.png" alt="" draggable="false"
+           style="height:var(--horse-h,6rem); width:auto; max-width:none; display:block;
+                  filter:drop-shadow(0 6px 12px rgba(0,0,0,.18));">
+    </div>
+  </div>
+</section>
+
+<!-- ─── Producto estrella: Body Builder 5000 ──────────── -->
+<?php if (!empty($flagship)): ?>
+<?php $flagImg = $flagship['images'][0] ?? '/assets/bodybuilder5000.jpg'; ?>
+<section class="relative overflow-hidden text-white"
+         style="background:linear-gradient(135deg,#1a0405 0%, #2d3436 50%, #3d0a0e 100%);">
+  <!-- Glows decorativos -->
+  <div aria-hidden="true" class="pointer-events-none absolute -left-24 top-1/4 h-96 w-96 rounded-full"
+       style="background:rgba(220,38,38,.30); filter:blur(80px);"></div>
+  <div aria-hidden="true" class="pointer-events-none absolute -right-32 bottom-0 h-[28rem] w-[28rem] rounded-full"
+       style="background:rgba(185,28,28,.22); filter:blur(80px);"></div>
+  <div aria-hidden="true" class="pointer-events-none absolute right-1/3 top-0 h-64 w-64 rounded-full"
+       style="background:rgba(65,210,72,.22); filter:blur(80px);"></div>
+
+  <div class="relative mx-auto w-full max-w-6xl px-4 sm:px-6 py-20 md:py-28">
+    <div class="grid grid-cols-1 items-center gap-10 md:grid-cols-2">
+      <div data-anim="scale-in" class="relative">
+        <div aria-hidden="true" class="absolute inset-0 -m-6 rounded-3xl"
+             style="background:linear-gradient(135deg, rgba(65,210,72,.25), transparent 50%, rgba(220,38,38,.20)); filter:blur(40px);"></div>
+        <img src="<?= e($flagImg) ?>" alt="<?= e($flagship['name']) ?>"
+             class="relative w-full rounded-2xl shadow-2xl ring-1 ring-white/10">
+        <div class="absolute -top-3 -right-3 rotate-3 rounded-full bg-brand-500 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-brand-500/40">
+          Marca propia
+        </div>
+      </div>
+
+      <div>
+        <p data-anim="fade-up" class="text-xs font-semibold uppercase tracking-[0.3em] text-brand-400">
+          Producto estrella · <?= e($flagship['category_name']) ?>
+        </p>
+        <h2 data-anim="fade-up" data-anim-delay="80" class="mt-4 text-4xl font-black leading-none tracking-tight md:text-5xl lg:text-6xl">
+          <span class="block text-white">Body</span>
+          <span class="block bg-clip-text text-transparent" style="background-image:linear-gradient(to right,#fca5a5,#ef4444,#b91c1c);">
+            Builder
+          </span>
+          <span class="brand-text-glow mt-1 block">5000</span>
+        </h2>
+
+        <p data-anim="fade-up" data-anim-delay="160" class="mt-6 text-lg font-medium text-red-300/90">
+          Suplemento alto en grasa y proteína · 11 libras
+        </p>
+
+        <ul data-anim="fade-up" data-anim-delay="240" class="mt-6 space-y-2.5 text-sm text-white/85">
+          <li class="flex items-start gap-2"><span class="mt-1.5 inline-block w-1.5 h-1.5 shrink-0 rounded-full bg-brand-400"></span> Mejora la condición corporal sin poner en riesgo la salud del caballo</li>
+          <li class="flex items-start gap-2"><span class="mt-1.5 inline-block w-1.5 h-1.5 shrink-0 rounded-full bg-brand-400"></span> 2 onzas en la mañana, 2 en la tarde</li>
+          <li class="flex items-start gap-2"><span class="mt-1.5 inline-block w-1.5 h-1.5 shrink-0 rounded-full bg-brand-400"></span> Se mezcla con el concentrado habitual</li>
+          <li class="flex items-start gap-2"><span class="mt-1.5 inline-block w-1.5 h-1.5 shrink-0 rounded-full bg-brand-400"></span> Una bolsa rinde aproximadamente 1.5 meses</li>
+        </ul>
+
+        <div data-anim="fade-up" data-anim-delay="320" class="mt-8 flex items-baseline gap-3">
+          <span class="text-4xl md:text-5xl font-black"><?= money($flagship['price']) ?></span>
+          <span class="text-sm text-white/50">/ 11 lb</span>
+        </div>
+
+        <div data-anim="fade-up" data-anim-delay="400" class="mt-6 flex flex-wrap items-center gap-3">
+          <button type="button" data-add-to-cart
+                  data-id="<?= e($flagship['id']) ?>"
+                  data-name="<?= e($flagship['name']) ?>"
+                  data-price="<?= e((string)$flagship['price']) ?>"
+                  data-image="<?= e($flagImg) ?>"
+                  class="inline-flex items-center gap-2 rounded-md bg-brand-500 px-7 py-3.5 font-bold text-white shadow-lg shadow-brand-500/50 transition hover:scale-[1.02] hover:bg-brand-600">
+            Añadir al carrito →
+          </button>
+          <a href="/productos/<?= e($flagship['slug']) ?>"
+             class="inline-flex items-center gap-2 rounded-md border-2 border-white/30 bg-white/5 px-5 py-3 font-semibold text-white backdrop-blur transition hover:border-white hover:bg-white/15">
+            Ver detalle <span class="animate-gallop">→</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<?php endif; ?>
+
+<!-- ─── Banner verde "Rastrear pedido" ──────────────── -->
+<section class="text-white" style="background:linear-gradient(to right,#28b22e,#1d8e23,#28b22e);">
+  <div class="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4 px-4 sm:px-6 py-6">
+    <div class="flex items-center gap-3">
+      <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/20">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <div>
+        <p class="font-bold text-base">¿Ya hiciste un pedido?</p>
+        <p class="text-sm text-white/85">Sigue el estado de tu compra en tiempo real.</p>
+      </div>
+    </div>
+    <a href="/orden" class="rounded-md bg-white px-6 py-3 font-semibold text-brand-700 transition hover:scale-[1.02] hover:bg-brand-50">
+      Rastrear mi pedido →
+    </a>
+  </div>
+</section>
+
+<!-- ─── Trust badges (stagger) ──────────────────────── -->
+<section class="bg-white">
+  <div data-anim="stagger" class="mx-auto grid grid-cols-1 max-w-6xl gap-6 px-4 sm:px-6 py-12 sm:grid-cols-2 lg:grid-cols-4">
+    <?php foreach ($TRUST_BADGES as $b): ?>
+      <div class="flex items-start gap-3">
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-700"><?= icon($b['icon'], 'w-6 h-6') ?></div>
+        <div>
+          <h3 class="font-semibold text-carbon"><?= e($b['title']) ?></h3>
+          <p class="mt-1 text-sm text-carbon-soft"><?= e($b['text']) ?></p>
+        </div>
+      </div>
+    <?php endforeach; ?>
+  </div>
+</section>
+
+<!-- ─── Categorías ──────────────────────────────────── -->
+<section class="bg-silver">
+  <div class="mx-auto w-full max-w-6xl px-4 sm:px-6 py-20">
+    <div data-anim="fade-up" class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-widest text-brand-600">Catálogo</p>
+        <h2 class="brand-title mt-2 text-3xl font-bold md:text-4xl">Categorías</h2>
+        <p class="mt-2 max-w-xl text-carbon-soft">
+          Encuentra lo que tu caballo necesita por etapa de entrenamiento o necesidad específica.
+        </p>
+      </div>
+      <a href="/productos" class="text-sm font-semibold text-brand-600 hover:underline">
+        Ver todos los productos →
+      </a>
+    </div>
+
+    <div data-anim="stagger" class="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <?php foreach ($categories as $cat): ?>
+        <a href="/productos?categoria=<?= e($cat['slug']) ?>"
+           class="hover-lift group block rounded-xl border border-silver-200 bg-white p-6 hover:border-brand-500 hover:shadow-xl hover:shadow-brand-500/10">
+          <div class="flex items-start justify-between">
+            <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-50 text-brand-700 transition group-hover:bg-brand-100">
+              <?= icon($CATEGORY_ICONS[$cat['slug']] ?? 'horseshoe', 'w-6 h-6') ?>
+            </div>
+            <span class="text-carbon-soft transition group-hover:translate-x-1 group-hover:text-brand-600"><?= icon('arrow-right', 'w-5 h-5') ?></span>
+          </div>
+          <h3 class="brand-title mt-5 text-xl font-bold"><?= e($cat['name']) ?></h3>
+          <?php if (!empty($cat['description'])): ?>
+            <p class="mt-2 text-sm text-carbon-soft"><?= e($cat['description']) ?></p>
+          <?php endif; ?>
+          <?php if (isset($cat['product_count'])): ?>
+            <p class="mt-4 text-xs text-carbon-soft"><?= (int)$cat['product_count'] ?> producto<?= $cat['product_count'] == 1 ? '' : 's' ?> disponibles</p>
+          <?php endif; ?>
+        </a>
+      <?php endforeach; ?>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Productos destacados ────────────────────────── -->
+<?php if (!empty($featured)): ?>
+<section class="bg-white">
+  <div class="mx-auto w-full max-w-6xl px-4 sm:px-6 py-20">
+    <div data-anim="fade-up">
+      <p class="text-sm font-semibold uppercase tracking-widest text-brand-600">Lo más recomendado</p>
+      <h2 class="brand-title mt-2 text-3xl font-bold md:text-4xl">Productos destacados</h2>
+    </div>
+
+    <div class="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4 lg:gap-6">
+      <?php foreach ($featured as $p): ?>
+        <?php
+          $img = $p['images'][0] ?? null;
+          $isOut = (int)$p['stock'] <= 0;
+        ?>
+        <article class="product-card hover-lift overflow-hidden rounded-xl border border-silver-200 bg-white flex min-w-0 <?= $isOut ? 'is-out-of-stock' : '' ?>">
+          <a href="/productos/<?= e($p['slug']) ?>" class="product-card-img-link block">
+            <?php if ($img): ?>
+              <img src="<?= e(cld_thumb($img, 480)) ?>" alt="<?= e($p['name']) ?>" loading="lazy" class="product-card-img">
+            <?php else: ?>
+              <div class="product-card-empty"><?= icon('package', 'w-8 h-8') ?></div>
+            <?php endif; ?>
+            <?php if ($isOut): ?>
+              <span class="product-card-stamp">Agotado</span>
+            <?php endif; ?>
+          </a>
+          <div class="p-3 sm:p-5 flex flex-col flex-1 min-w-0">
+            <p class="text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-brand-600 line-clamp-1"><?= e($p['category_name']) ?></p>
+            <a href="/productos/<?= e($p['slug']) ?>" class="min-w-0">
+              <h3 class="brand-title mt-0.5 sm:mt-2 line-clamp-2 text-sm sm:text-base font-semibold leading-snug hover:text-brand-700 break-words"><?= e($p['name']) ?></h3>
+            </a>
+            <p class="mt-1 sm:mt-3 text-base sm:text-xl font-bold text-brand-600 truncate"><?= money($p['price']) ?></p>
+            <button type="button" data-add-to-cart
+                    data-id="<?= e($p['id']) ?>"
+                    data-name="<?= e($p['name']) ?>"
+                    data-price="<?= e((string)$p['price']) ?>"
+                    data-image="<?= e($img ?? '') ?>"
+                    class="mt-2 sm:mt-4 w-full inline-flex items-center justify-center gap-2 rounded-md bg-brand-500 px-2 sm:px-4 py-1.5 sm:py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:bg-brand-600 <?= $p['stock'] <= 0 ? 'opacity-60 pointer-events-none' : '' ?>"
+                    <?= $p['stock'] <= 0 ? 'disabled' : '' ?>>
+              <?php if ($p['stock'] <= 0): ?>Agotado
+              <?php else: ?>
+                <span class="sm:hidden">+ Añadir</span>
+                <span class="hidden sm:inline">Añadir al carrito</span>
+              <?php endif; ?>
+            </button>
+          </div>
+        </article>
+      <?php endforeach; ?>
+    </div>
+  </div>
+</section>
+<?php endif; ?>
+
+<!-- ─── Banda parallax con foto de campo ────────────── -->
+<section class="relative h-72 md:h-96 overflow-hidden" style="background:linear-gradient(135deg,#1d8e23,#156c1a,#2d3436);">
+  <img src="<?= e($FIELD_LANDSCAPE) ?>" alt="" loading="lazy" class="absolute inset-0 h-full w-full object-cover">
+  <div aria-hidden="true" class="absolute inset-0"
+       style="background:linear-gradient(to right, rgba(13,77,17,.70), rgba(21,108,26,.45), rgba(29,142,35,.35));"></div>
+
+  <div class="relative mx-auto flex h-full max-w-6xl items-center justify-center px-6 text-center">
+    <div data-anim="fade-up">
+      <p class="text-xs font-semibold uppercase tracking-[0.3em] text-brand-300">Suplementos GM</p>
+      <h2 class="mt-3 text-3xl md:text-5xl font-bold leading-tight text-white">
+        Donde la pasión se convierte en cuidado
+      </h2>
+    </div>
+  </div>
+</section>
+
+<!-- ─── About ───────────────────────────────────────── -->
+<section class="bg-silver">
+  <div class="mx-auto grid grid-cols-1 max-w-6xl gap-10 px-4 sm:px-6 py-20 md:grid-cols-2 md:items-center">
+    <div data-anim="fade-up" class="order-2 md:order-1">
+      <p class="text-sm font-semibold uppercase tracking-widest text-brand-600">Pasión por los caballos</p>
+      <h2 class="brand-title mt-2 text-3xl md:text-4xl font-bold">
+        Cuidamos a tu caballo como parte de tu familia
+      </h2>
+      <p class="mt-4 text-carbon-soft leading-relaxed">
+        Trabajamos con criadores, jinetes y veterinarios de toda Colombia.
+        Nuestro catálogo reúne marcas reconocidas en nutrición,
+        recuperación y cuidado integral, para que tu caballo siempre esté
+        en su mejor forma.
+      </p>
+      <ul class="mt-6 space-y-3 text-sm">
+        <li class="flex items-start gap-2 text-carbon"><span class="brand-text font-bold">✓</span> Atención personalizada por WhatsApp antes y después de la compra</li>
+        <li class="flex items-start gap-2 text-carbon"><span class="brand-text font-bold">✓</span> Envíos a todo el territorio nacional con tu transportadora preferida</li>
+        <li class="flex items-start gap-2 text-carbon"><span class="brand-text font-bold">✓</span> Asesoría en dosis y combinación con tu plan veterinario</li>
+      </ul>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="/productos" class="btn-primary">Explorar el catálogo <span class="animate-gallop">→</span></a>
+        <a href="/orden" class="btn-outline">Rastrear pedido</a>
+      </div>
+    </div>
+
+    <div data-anim="scale-in" class="order-1 md:order-2">
+      <div class="relative overflow-hidden rounded-2xl shadow-xl ring-1 ring-black/5">
+        <img src="<?= e($FIELD_HORSE) ?>" alt="Caballo en el potrero" loading="lazy" class="h-[420px] w-full object-cover">
+        <div class="pointer-events-none absolute inset-0 bg-gradient-to-tr from-brand-900/20 via-transparent to-transparent"></div>
+      </div>
+    </div>
+  </div>
+</section>

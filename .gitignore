@@ -1,0 +1,38 @@
+# Secrets
+.env
+.env.local
+.env.production
+*.pem
+*.key
+*.p12
+*.secret
+
+# Claude
+CLAUDE.md
+.claude/
+
+# PHP
+vendor/
+*.log
+/tmp/
+
+# Build
+build/
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Plesk
+.php-ini
+.php-version
+
+# Database (datos reales)
+data/*.sqlite
+data/*.db
+
+# Binarios
+bin/tailwindcss
+bin/*.exe

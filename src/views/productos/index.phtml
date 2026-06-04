@@ -1,0 +1,283 @@
+<?php
+/** @var array $result */
+/** @var array $categories */
+/** @var array $brands */
+/** @var array $opts */
+/** @var ?array $currentCat */
+
+function build_qs(array $current, array $override = []): string {
+    $merged = array_merge($current, $override);
+    $merged = array_filter($merged, fn($v) => $v !== null && $v !== '');
+    return http_build_query($merged);
+}
+$qsBase = ['categoria' => $opts['category'], 'marca' => $opts['brand'], 'q' => $opts['q'], 'min' => $opts['min'], 'max' => $opts['max']];
+?>
+
+<section class="w-full bg-gradient-to-br from-carbon via-carbon to-brand-900 text-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
+    <nav class="text-[11px] sm:text-xs text-white/60 mb-1.5 sm:mb-3 flex flex-wrap items-center gap-x-1 gap-y-0.5">
+      <a href="/" class="hover:text-brand-300">Inicio</a>
+      <span>/</span>
+      <a href="/productos" class="hover:text-brand-300">Catálogo</a>
+      <?php if ($currentCat): ?>
+        <span>/</span>
+        <span class="text-white"><?= e($currentCat['name']) ?></span>
+      <?php endif; ?>
+    </nav>
+    <h1 data-anim-hero class="text-xl sm:text-3xl md:text-5xl font-bold leading-tight">
+      <?= e($currentCat ? $currentCat['name'] : 'Catálogo completo') ?>
+    </h1>
+    <?php if ($currentCat && $currentCat['description']): ?>
+      <p data-anim-hero class="mt-2 sm:mt-3 text-xs sm:text-base text-white/75 max-w-3xl line-clamp-2 sm:line-clamp-none"><?= e($currentCat['description']) ?></p>
+    <?php elseif (!$currentCat): ?>
+      <p data-anim-hero class="mt-2 sm:mt-3 text-xs sm:text-base text-white/75 max-w-3xl">
+        Suplementos e insumos veterinarios seleccionados con criterio profesional.
+      </p>
+    <?php endif; ?>
+  </div>
+</section>
+
+<!-- Layout principal del catálogo: usa CSS custom (.catalog-layout) en lugar
+     de utilidades Tailwind para no depender de la recompilación. Móvil:
+     flex column (todo apilado al 100%). Desktop ≥1024px: grid [260px 1fr]. -->
+<div class="catalog-layout">
+  <?php
+    $activeFilters = (int)(!empty($opts['q']))
+      + (int)(!empty($opts['brand']))
+      + (int)(!empty($opts['min']))
+      + (int)(!empty($opts['max']));
+  ?>
+  <!-- Sidebar de filtros: en móvil se colapsa con un botón toggle; en desktop
+       siempre se muestra (el botón se oculta con lg:hidden y la regla
+       .filter-panel { display:block !important } en desktop). -->
+  <aside class="catalog-sidebar">
+    <button type="button"
+            data-filter-toggle
+            aria-expanded="<?= $activeFilters > 0 ? 'true' : 'false' ?>"
+            aria-controls="filter-panel"
+            class="lg:hidden mb-3 w-full flex items-center justify-between gap-2 rounded-2xl border border-silver-200 bg-white px-4 py-3 text-sm font-semibold shadow-sm">
+      <span class="inline-flex items-center gap-2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>
+        </svg>
+        Filtros
+        <?php if ($activeFilters > 0): ?>
+          <span class="ml-1 inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-brand-500 text-white text-[10px] font-bold"><?= $activeFilters ?></span>
+        <?php endif; ?>
+      </span>
+      <svg data-filter-chevron class="transition-transform" width="14" height="14" viewBox="0 0 12 12" fill="none">
+        <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <div id="filter-panel"
+         data-filter-panel
+         data-open="<?= $activeFilters > 0 ? 'true' : 'false' ?>"
+         class="filter-panel rounded-2xl border border-silver-200 bg-white shadow-sm">
+      <form method="get" class="space-y-5 sm:space-y-6 p-4 sm:p-5">
+      <?php if ($opts['category']): ?>
+        <input type="hidden" name="categoria" value="<?= e($opts['category']) ?>">
+      <?php endif; ?>
+
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-carbon-soft mb-2">Buscar</label>
+        <input type="search" name="q" value="<?= e($opts['q'] ?? '') ?>" placeholder="Nombre o palabra clave"
+               class="w-full rounded-lg border border-silver-200 px-3 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20">
+      </div>
+
+      <div>
+        <div class="text-xs font-bold uppercase tracking-wider text-carbon-soft mb-3">Categorías</div>
+        <ul class="space-y-1 text-sm">
+          <li><a href="/productos" class="block px-2.5 py-1.5 rounded-md hover:bg-silver <?= !$opts['category'] ? 'bg-brand-50 font-semibold text-brand-700' : '' ?>">Todas</a></li>
+          <?php foreach ($categories as $c): ?>
+            <li>
+              <a href="/productos?categoria=<?= e($c['slug']) ?>"
+                 class="block px-2.5 py-1.5 rounded-md hover:bg-silver <?= $opts['category'] === $c['slug'] ? 'bg-brand-50 font-semibold text-brand-700' : '' ?>">
+                <?= e($c['name']) ?>
+              </a>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      </div>
+
+      <?php if (!empty($brands)): ?>
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-carbon-soft mb-2">Marca</label>
+        <select name="marca" class="w-full rounded-lg border border-silver-200 px-3 py-2 bg-white focus:border-brand-500 focus:outline-none">
+          <option value="">Todas</option>
+          <?php foreach ($brands as $b): ?>
+            <option value="<?= e($b) ?>" <?= $opts['brand'] === $b ? 'selected' : '' ?>><?= e($b) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <?php endif; ?>
+
+      <div>
+        <div class="text-xs font-bold uppercase tracking-wider text-carbon-soft mb-2">Precio</div>
+        <div class="grid grid-cols-2 gap-2">
+          <input type="number" name="min" value="<?= e((string)($opts['min'] ?? '')) ?>" min="0" step="1000" placeholder="Mín."
+                 class="w-full rounded-lg border border-silver-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none">
+          <input type="number" name="max" value="<?= e((string)($opts['max'] ?? '')) ?>" min="0" step="1000" placeholder="Máx."
+                 class="w-full rounded-lg border border-silver-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none">
+        </div>
+      </div>
+
+      <div class="flex gap-2 pt-2 border-t border-silver-200">
+        <button class="flex-1 h-10 rounded-md bg-carbon text-white text-sm font-semibold hover:bg-carbon-soft transition">Filtrar</button>
+        <a href="/productos" class="h-10 px-3 rounded-md border border-silver-200 text-sm flex items-center hover:bg-silver">Limpiar</a>
+      </div>
+      </form>
+    </div>
+  </aside>
+
+  <script>
+    // Toggle del panel de filtros en móvil. En desktop el CSS lo fuerza a
+    // mostrarse siempre (.filter-panel { display:block } en >=1024px).
+    (function () {
+      const btn   = document.querySelector('[data-filter-toggle]');
+      const panel = document.querySelector('[data-filter-panel]');
+      if (!btn || !panel) return;
+      btn.addEventListener('click', function () {
+        const open = panel.getAttribute('data-open') === 'true';
+        panel.setAttribute('data-open', open ? 'false' : 'true');
+        btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+        const chev = btn.querySelector('[data-filter-chevron]');
+        if (chev) chev.style.transform = open ? '' : 'rotate(180deg)';
+      });
+    })();
+  </script>
+
+  <section class="catalog-main">
+    <div class="flex items-center justify-between mb-5">
+      <p class="text-sm text-carbon-soft">
+        <strong class="text-carbon"><?= (int)$result['total'] ?></strong>
+        producto<?= $result['total'] == 1 ? '' : 's' ?>
+        <?= $opts['q'] ? 'que coinciden con "' . e($opts['q']) . '"' : '' ?>
+      </p>
+    </div>
+
+    <?php if (empty($result['items'])): ?>
+      <div class="text-center py-20 bg-white border border-silver-200 rounded-2xl">
+        <div class="mx-auto w-14 h-14 rounded-full bg-silver flex items-center justify-center text-carbon-soft mb-4"><?= icon('search', 'w-7 h-7') ?></div>
+        <p class="text-carbon-soft mb-4">No encontramos productos con esos filtros.</p>
+        <a href="/productos" class="btn-primary">Ver todos los productos</a>
+      </div>
+    <?php else: ?>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6 w-full">
+        <?php foreach ($result['items'] as $i => $p): ?>
+          <?php
+            $img = $p['images'][0] ?? null;
+            $isOut = (int)$p['stock'] <= 0;
+          ?>
+          <article class="product-card hover-lift overflow-hidden rounded-xl border border-silver-200 bg-white flex w-full min-w-0 <?= $isOut ? 'is-out-of-stock' : '' ?>">
+            <a href="/productos/<?= e($p['slug']) ?>" class="product-card-img-link block">
+              <?php if ($img): ?>
+                <img src="<?= e(cld_thumb($img, 480)) ?>" alt="<?= e($p['name']) ?>" loading="lazy"
+                     class="product-card-img">
+              <?php else: ?>
+                <div class="product-card-empty"><?= icon('package', 'w-8 h-8') ?></div>
+              <?php endif; ?>
+              <?php if ($isOut): ?>
+                <span class="product-card-stamp">Agotado</span>
+              <?php endif; ?>
+            </a>
+            <div class="p-3 sm:p-5 flex flex-col flex-1 min-w-0">
+              <p class="text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-brand-600 line-clamp-1"><?= e($p['category_name']) ?></p>
+              <a href="/productos/<?= e($p['slug']) ?>" class="min-w-0">
+                <h3 class="brand-title mt-0.5 sm:mt-2 line-clamp-2 text-sm sm:text-base font-semibold leading-snug hover:text-brand-700 break-words"><?= e($p['name']) ?></h3>
+              </a>
+              <?php if ($p['brand']): ?>
+                <p class="mt-0.5 sm:mt-1 text-[10px] sm:text-xs text-carbon-soft line-clamp-1"><?= e($p['brand']) ?></p>
+              <?php endif; ?>
+              <div class="mt-auto pt-2 sm:pt-3 flex items-end justify-between gap-2 min-w-0">
+                <span class="text-base sm:text-xl font-extrabold text-brand-600 leading-none truncate"><?= money($p['price']) ?></span>
+                <?php if (!$isOut): ?>
+                  <span class="inline-flex text-[9px] sm:text-[11px] font-semibold text-brand-700 bg-brand-50 rounded-full px-1.5 sm:px-2 py-0.5 whitespace-nowrap">En stock</span>
+                <?php else: ?>
+                  <span class="inline-flex text-[9px] sm:text-[11px] font-semibold text-red-700 bg-red-50 rounded-full px-1.5 sm:px-2 py-0.5 whitespace-nowrap">Agotado</span>
+                <?php endif; ?>
+              </div>
+              <?php if (!$isOut): ?>
+                <button type="button" data-add-to-cart
+                        data-id="<?= e($p['id']) ?>"
+                        data-name="<?= e($p['name']) ?>"
+                        data-price="<?= e((string)$p['price']) ?>"
+                        data-image="<?= e($img ?? '') ?>"
+                        class="mt-2 sm:mt-3 w-full inline-flex items-center justify-center rounded-md bg-brand-500 px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-white hover:bg-brand-600 transition">
+                  <span class="sm:hidden">+ Añadir</span>
+                  <span class="hidden sm:inline">Añadir al carrito</span>
+                </button>
+              <?php else: ?>
+                <button type="button" disabled
+                        class="mt-2 sm:mt-3 w-full inline-flex items-center justify-center rounded-md bg-silver-200 text-carbon-soft px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold cursor-not-allowed">
+                  Sin stock
+                </button>
+              <?php endif; ?>
+            </div>
+          </article>
+        <?php endforeach; ?>
+      </div>
+
+      <?php if ($result['pages'] > 1):
+        // ─── Paginación "ventana" con elipsis ────────────────
+        // En lugar de pintar TODAS las páginas (que en móvil con 19+ páginas se
+        // sale del viewport), mostramos:
+        //   - primera y última siempre
+        //   - 1 página antes y 1 después de la actual
+        //   - '...' donde hay saltos
+        $current = (int)$result['page'];
+        $total   = (int)$result['pages'];
+        $delta   = 1;
+        $pages = [];
+        if ($total <= 7) {
+            $pages = range(1, $total);
+        } else {
+            $pages[] = 1;
+            if ($current - $delta > 2) $pages[] = '...';
+            $start = max(2, $current - $delta);
+            $end   = min($total - 1, $current + $delta);
+            for ($i = $start; $i <= $end; $i++) $pages[] = $i;
+            if ($current + $delta < $total - 1) $pages[] = '...';
+            $pages[] = $total;
+        }
+      ?>
+        <nav class="mt-10 sm:mt-12 flex flex-wrap justify-center items-center gap-1 sm:gap-1.5 text-sm">
+          <!-- Botón anterior -->
+          <?php if ($current > 1): ?>
+            <a href="?<?= build_qs($qsBase, ['p' => $current - 1]) ?>"
+               aria-label="Página anterior"
+               class="h-9 sm:h-10 px-2.5 sm:px-3 inline-flex items-center justify-center rounded-md border border-silver-200 hover:bg-silver">
+              ←
+            </a>
+          <?php endif; ?>
+
+          <?php foreach ($pages as $p): ?>
+            <?php if ($p === '...'): ?>
+              <span class="h-9 sm:h-10 px-1 inline-flex items-center justify-center text-carbon-soft">…</span>
+            <?php else: ?>
+              <a href="?<?= build_qs($qsBase, ['p' => $p]) ?>"
+                 aria-current="<?= $p === $current ? 'page' : 'false' ?>"
+                 class="min-w-9 sm:min-w-10 h-9 sm:h-10 px-2.5 sm:px-3 inline-flex items-center justify-center rounded-md border text-xs sm:text-sm <?= $p === $current ? 'border-brand-500 bg-brand-500 text-white font-semibold' : 'border-silver-200 hover:bg-silver' ?>">
+                <?= $p ?>
+              </a>
+            <?php endif; ?>
+          <?php endforeach; ?>
+
+          <!-- Botón siguiente -->
+          <?php if ($current < $total): ?>
+            <a href="?<?= build_qs($qsBase, ['p' => $current + 1]) ?>"
+               aria-label="Página siguiente"
+               class="h-9 sm:h-10 px-2.5 sm:px-3 inline-flex items-center justify-center rounded-md border border-silver-200 hover:bg-silver">
+              →
+            </a>
+          <?php endif; ?>
+        </nav>
+
+        <!-- Indicador "Página X de Y" — solo en móvil, ayuda al contexto -->
+        <p class="mt-3 sm:hidden text-center text-xs text-carbon-soft">
+          Página <strong class="text-carbon"><?= $current ?></strong> de <?= $total ?>
+        </p>
+      <?php endif; ?>
+    <?php endif; ?>
+  </section>
+</div>

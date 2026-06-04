@@ -1,0 +1,171 @@
+<?php
+/** @var array $legal */
+require __DIR__ . '/_partials/layout.phtml';
+?>
+
+<p>
+  La presente Política de Tratamiento de Datos Personales se expide en cumplimiento de la
+  <strong>Ley 1581 de 2012</strong>, el <strong>Decreto 1377 de 2013</strong> y demás normas
+  concordantes que regulan la protección de datos personales en Colombia.
+</p>
+
+<h2>1. Responsable del tratamiento</h2>
+<p>
+  <strong><?= e($legal['name']) ?></strong>, identificado con <?= e($legal['doc_type']) ?>
+  <strong><?= e($legal['doc_id']) ?></strong>, con domicilio en <?= e($legal['address']) ?>,
+  es responsable del tratamiento de los datos personales recolectados a través de
+  <a href="https://<?= e($legal['domain']) ?>"><?= e($legal['domain']) ?></a>.
+</p>
+<ul>
+  <li>Correo de contacto para protección de datos: <a href="mailto:<?= e($legal['email']) ?>"><?= e($legal['email']) ?></a></li>
+  <li>Teléfono: <a href="<?= e($legal['whatsapp']) ?>"><?= e($legal['phone']) ?></a></li>
+</ul>
+
+<h2>2. Datos personales que recolectamos</h2>
+<p>Para el funcionamiento de la Tienda y la prestación del servicio, recolectamos:</p>
+<h3>2.1 Datos de identificación y contacto</h3>
+<ul>
+  <li>Nombre completo o razón social</li>
+  <li>Tipo y número de documento (CC, CE, NIT, PP, TI)</li>
+  <li>Correo electrónico</li>
+  <li>Número de teléfono / WhatsApp</li>
+</ul>
+
+<h3>2.2 Datos de facturación y envío</h3>
+<ul>
+  <li>Dirección física</li>
+  <li>Ciudad y departamento</li>
+  <li>Notas de entrega</li>
+</ul>
+
+<h3>2.3 Datos de transacción</h3>
+<ul>
+  <li>Historial de pedidos</li>
+  <li>Productos adquiridos</li>
+  <li>Monto y método de pago (sin almacenar números de tarjeta — los procesa Wompi)</li>
+  <li>Identificadores de transacciones de pago</li>
+</ul>
+
+<h3>2.4 Datos técnicos y de uso</h3>
+<ul>
+  <li>Dirección IP, navegador, sistema operativo</li>
+  <li>Páginas visitadas dentro de la Tienda</li>
+  <li>Cookies de sesión (ver <a href="/legal/cookies">Aviso de Cookies</a>)</li>
+</ul>
+
+<h2>3. Finalidades del tratamiento</h2>
+<p>Sus datos personales son tratados únicamente para los siguientes propósitos:</p>
+<ol>
+  <li><strong>Ejecutar la compraventa:</strong> procesar pedidos, coordinar envíos y entregas, gestionar pagos.</li>
+  <li><strong>Cumplir obligaciones legales y tributarias:</strong> emitir facturas electrónicas ante la DIAN y conservar registros.</li>
+  <li><strong>Atención al cliente:</strong> responder consultas, reclamos, garantías y devoluciones.</li>
+  <li><strong>Comunicaciones operativas:</strong> enviar confirmaciones, notificaciones de envío y actualizaciones del pedido.</li>
+  <li><strong>Mejora del servicio:</strong> análisis interno del uso de la Tienda para mejorar la experiencia.</li>
+  <li><strong>Cumplir requerimientos de autoridad competente</strong> cuando aplique.</li>
+</ol>
+<p>
+  <strong>No realizamos perfilamiento publicitario ni venta de datos a terceros.</strong> No enviamos
+  comunicaciones de marketing salvo que el titular lo autorice expresamente.
+</p>
+
+<h2>4. Derechos del titular</h2>
+<p>De acuerdo con el artículo 8 de la Ley 1581 de 2012, el titular tiene derecho a:</p>
+<ul>
+  <li><strong>Conocer, actualizar y rectificar</strong> sus datos personales.</li>
+  <li><strong>Solicitar prueba</strong> de la autorización otorgada para el tratamiento.</li>
+  <li><strong>Ser informado</strong> sobre el uso que se le ha dado a sus datos.</li>
+  <li><strong>Presentar quejas</strong> ante la Superintendencia de Industria y Comercio (SIC) por infracciones a la ley.</li>
+  <li><strong>Revocar la autorización</strong> y/o solicitar la supresión del dato, salvo que exista deber legal o contractual de conservarlo.</li>
+  <li><strong>Acceder de forma gratuita</strong> a sus datos personales que hayan sido objeto de tratamiento.</li>
+</ul>
+
+<h2>5. Cómo ejercer sus derechos</h2>
+<p>Para ejercer cualquiera de los derechos anteriores, el titular o su representante puede:</p>
+<ol>
+  <li>Enviar una solicitud al correo <a href="mailto:<?= e($legal['email']) ?>"><?= e($legal['email']) ?></a>
+      indicando claramente el derecho que ejerce, los datos a tratar, y adjuntando copia de su documento
+      de identidad.</li>
+  <li>O contactarnos por WhatsApp al <a href="<?= e($legal['whatsapp']) ?>"><?= e($legal['phone']) ?></a>.</li>
+</ol>
+<p>
+  Las consultas serán atendidas en un plazo máximo de <strong>diez (10) días hábiles</strong> y los
+  reclamos en un plazo máximo de <strong>quince (15) días hábiles</strong>, contados a partir del día
+  siguiente a la recepción de la solicitud, conforme a los artículos 14 y 15 de la Ley 1581.
+</p>
+
+<h2>6. Transferencia y transmisión a terceros</h2>
+<p>
+  Para la prestación del servicio, compartimos datos estrictamente necesarios con los siguientes
+  encargados del tratamiento, todos vinculados mediante términos contractuales que garantizan la
+  protección de los datos:
+</p>
+<ul>
+  <li><strong>Wompi S.A.S.</strong> (Colombia) — pasarela de pagos. Procesa datos de transacción
+      y de identificación necesarios para autenticar el pago.</li>
+  <li><strong>Alegra S.A.S.</strong> — sistema de facturación electrónica autorizado por la DIAN.
+      Procesa datos de facturación.</li>
+  <li><strong>Resend Inc.</strong> (Estados Unidos) — proveedor de correo transaccional. Procesa
+      direcciones de correo y contenido de los emails enviados.</li>
+  <li><strong>Cloudinary Ltd.</strong> (Israel/EE.UU.) — almacenamiento y entrega de imágenes de
+      productos.</li>
+  <li><strong>InterRapidísimo S.A.</strong>, empresas de transporte y mensajeros locales — datos de
+      envío necesarios para la entrega.</li>
+</ul>
+<p>
+  Estos terceros operan bajo sus propias políticas de privacidad y normas aplicables. La transferencia
+  internacional de datos a Estados Unidos (Resend, Cloudinary) se realiza bajo cláusulas contractuales
+  estándar que garantizan un nivel adecuado de protección.
+</p>
+
+<h2>7. Conservación de los datos</h2>
+<p>
+  Los datos serán conservados durante el tiempo necesario para cumplir con las finalidades del
+  tratamiento, las obligaciones legales (especialmente las tributarias y contables, que en Colombia
+  pueden requerir conservación hasta por <strong>diez (10) años</strong>) y mientras subsistan
+  responsabilidades legales o contractuales.
+</p>
+<p>
+  Una vez vencido este periodo, los datos serán suprimidos o anonimizados, salvo que exista una
+  obligación legal de conservarlos por más tiempo.
+</p>
+
+<h2>8. Seguridad de la información</h2>
+<p>
+  Implementamos medidas técnicas, humanas y administrativas razonables para proteger los datos
+  personales contra acceso no autorizado, pérdida, alteración o divulgación no autorizada:
+</p>
+<ul>
+  <li>Conexión cifrada HTTPS en toda la Tienda.</li>
+  <li>Almacenamiento seguro de credenciales con hash bcrypt.</li>
+  <li>Pasarela de pago certificada PCI-DSS (Wompi).</li>
+  <li>Acceso al panel administrativo restringido a personal autorizado.</li>
+  <li>Sanitización y validación de todos los datos ingresados.</li>
+  <li>Copias de seguridad periódicas.</li>
+</ul>
+
+<h2>9. Tratamiento de datos de menores</h2>
+<p>
+  La Tienda no está dirigida a menores de edad. No recolectamos a sabiendas datos de personas menores
+  de 18 años. Si tenemos conocimiento de que un menor ha proporcionado datos sin autorización de sus
+  representantes legales, procederemos a eliminarlos.
+</p>
+
+<h2>10. Cambios a esta política</h2>
+<p>
+  Esta política puede ser actualizada para reflejar cambios legales o en nuestras prácticas. Cualquier
+  modificación será publicada en esta misma página con la fecha de actualización. Los cambios sustanciales
+  serán notificados por correo electrónico cuando aplique.
+</p>
+
+<h2>11. Autoridad de control</h2>
+<p>
+  El titular podrá presentar reclamaciones ante la <strong>Superintendencia de Industria y Comercio
+  (SIC)</strong>, Delegatura para la Protección de Datos Personales, una vez agotado el trámite de
+  consulta o reclamo ante Suplementos GM.
+</p>
+<ul>
+  <li>Sitio web: <a href="https://www.sic.gov.co" target="_blank" rel="noopener">www.sic.gov.co</a></li>
+  <li>Línea gratuita nacional: 01-8000-910165</li>
+</ul>
+
+<?php require __DIR__ . '/_partials/layout-end.phtml'; ?>

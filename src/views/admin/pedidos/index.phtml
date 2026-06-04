@@ -1,0 +1,169 @@
+<?php
+/** @var array $orders  conteos por status */
+/** @var array $result  {items, total, page, pages, perPage} */
+/** @var array $opts    {status, q, page}                       */
+
+$badgeClass = [
+    'PENDING'   => 'bg-amber-100 text-amber-800',
+    'PAID'      => 'bg-brand-100 text-brand-800',
+    'FAILED'    => 'bg-red-100 text-red-800',
+    'SHIPPED'   => 'bg-blue-100 text-blue-800',
+    'DELIVERED' => 'bg-silver text-carbon',
+    'CANCELLED' => 'bg-silver text-carbon-soft',
+];
+
+function qs_orders(array $current, array $override = []): string {
+    $merged = array_merge($current, $override);
+    $merged = array_filter($merged, fn($v) => $v !== null && $v !== '' && $v !== false);
+    // remover keys que no interesan para la URL
+    unset($merged['perPage']);
+    return http_build_query($merged);
+}
+?>
+<div class="space-y-6">
+  <div class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <h1 class="brand-title text-3xl font-bold">Pedidos</h1>
+      <p class="mt-1 text-sm text-carbon-soft">Gestión completa de pedidos: estado, envío, notas, emails.</p>
+    </div>
+    <a href="/admin/emails" class="inline-flex items-center gap-2 rounded-md border border-silver-200 bg-white px-4 py-2 text-sm font-medium hover:border-brand-500 hover:text-brand-600 transition">
+      <?= icon('mail', 'w-4 h-4') ?> Ver emails enviados
+    </a>
+  </div>
+
+  <!-- Resumen por estado (filtros clickeables) -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+    <?php
+    $cards = [
+      [null,         'Todos',     $orders['total'],     'bg-white'],
+      ['PENDING',    'Pendientes',$orders['pending'],   'bg-amber-50'],
+      ['PAID',       'Pagados',   $orders['paid'],      'bg-brand-50'],
+      ['SHIPPED',    'Enviados',  $orders['shipped'],   'bg-blue-50'],
+      ['DELIVERED',  'Entregados',$orders['delivered'], 'bg-silver'],
+      ['CANCELLED',  'Cancelados',$orders['cancelled'], 'bg-silver'],
+      ['FAILED',     'Fallidos',  $orders['failed'],    'bg-red-50'],
+    ];
+    foreach ($cards as [$key, $label, $val, $bg]):
+      $isActive = ($opts['status'] ?? null) === $key;
+      $href = '/admin/pedidos' . ($key ? '?status=' . urlencode($key) : '');
+    ?>
+      <a href="<?= e($href) ?>"
+         class="<?= $bg ?> border <?= $isActive ? 'border-brand-500 ring-2 ring-brand-500/30' : 'border-silver-200 hover:border-brand-300' ?> rounded-xl p-3 transition">
+        <div class="text-xs uppercase tracking-wider text-carbon-soft"><?= e($label) ?></div>
+        <div class="mt-0.5 text-xl font-bold"><?= (int)$val ?></div>
+      </a>
+    <?php endforeach; ?>
+  </div>
+
+  <!-- Buscador -->
+  <form method="get" class="flex flex-wrap items-center gap-2">
+    <?php if (!empty($opts['status'])): ?>
+      <input type="hidden" name="status" value="<?= e($opts['status']) ?>">
+    <?php endif; ?>
+    <div class="relative flex-1 min-w-[200px]">
+      <?= icon('search', 'w-4 h-4 text-carbon-soft absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none') ?>
+      <input type="search" name="q" value="<?= e($opts['q'] ?? '') ?>"
+             placeholder="Buscar por número, email, teléfono o nombre…"
+             class="w-full h-10 pl-10 pr-3 rounded-md border border-silver-200 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20">
+    </div>
+    <button class="h-10 px-4 rounded-md bg-carbon text-white text-sm font-semibold hover:bg-carbon-soft transition">Buscar</button>
+    <?php if (!empty($opts['q']) || !empty($opts['status'])): ?>
+      <a href="/admin/pedidos" class="h-10 px-3 inline-flex items-center text-sm text-carbon-soft hover:text-brand-600">Limpiar</a>
+    <?php endif; ?>
+  </form>
+
+  <!-- Tabla -->
+  <?php if ($result['total'] === 0): ?>
+    <div class="rounded-xl border border-silver-200 bg-white p-12 text-center">
+      <div class="mx-auto w-14 h-14 rounded-full bg-silver flex items-center justify-center text-carbon-soft mb-3"><?= icon('cart', 'w-6 h-6') ?></div>
+      <h2 class="text-lg font-semibold mb-2">
+        <?= !empty($opts['q']) || !empty($opts['status']) ? 'No hay pedidos con esos filtros' : 'Aún no hay pedidos' ?>
+      </h2>
+      <p class="text-sm text-carbon-soft">
+        <?php if (!empty($opts['q']) || !empty($opts['status'])): ?>
+          <a href="/admin/pedidos" class="text-brand-600 hover:underline">Limpiar filtros</a> para ver todos.
+        <?php else: ?>
+          Cuando los clientes hagan checkout y paguen, los pedidos aparecerán aquí.
+        <?php endif; ?>
+      </p>
+    </div>
+  <?php else: ?>
+    <div class="overflow-hidden rounded-xl border border-silver-200 bg-white">
+      <table class="w-full text-sm">
+        <thead class="bg-silver text-left text-xs uppercase tracking-wide text-carbon-soft">
+          <tr>
+            <th class="px-4 py-3">Pedido</th>
+            <th class="px-4 py-3">Cliente</th>
+            <th class="px-4 py-3">Items</th>
+            <th class="px-4 py-3 text-right">Total</th>
+            <th class="px-4 py-3">Estado</th>
+            <th class="px-4 py-3">Fecha</th>
+            <th class="px-4 py-3 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-silver-200">
+          <?php foreach ($result['items'] as $o): ?>
+            <tr class="hover:bg-silver/40">
+              <td class="px-4 py-3">
+                <a href="/admin/pedidos/<?= e($o['id']) ?>" class="font-mono text-xs text-brand-700 hover:underline"><?= e($o['order_number']) ?></a>
+              </td>
+              <td class="px-4 py-3 min-w-0">
+                <div class="font-medium truncate max-w-[200px]"><?= e($o['customer_name']) ?></div>
+                <div class="text-[11px] text-carbon-soft truncate max-w-[200px]"><?= e($o['customer_email']) ?></div>
+              </td>
+              <td class="px-4 py-3 text-center"><?= (int)$o['item_count'] ?></td>
+              <td class="px-4 py-3 text-right font-semibold text-brand-700 font-mono"><?= money((int)$o['total']) ?></td>
+              <td class="px-4 py-3">
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold <?= e($badgeClass[$o['status']] ?? 'bg-silver text-carbon') ?>">
+                  <?= e($o['status']) ?>
+                </span>
+              </td>
+              <td class="px-4 py-3 text-xs text-carbon-soft whitespace-nowrap"><?= e(date('d M H:i', strtotime($o['created_at']))) ?></td>
+              <td class="px-4 py-3 text-right">
+                <a href="/admin/pedidos/<?= e($o['id']) ?>"
+                   class="inline-flex items-center gap-1 rounded-md border border-silver-200 px-2.5 py-1 text-xs font-medium hover:border-brand-500 hover:text-brand-600 transition">
+                  Ver detalle <?= icon('arrow-right', 'w-3 h-3') ?>
+                </a>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    <?php if ($result['pages'] > 1):
+      $current = (int)$result['page'];
+      $total   = (int)$result['pages'];
+      $pages = [];
+      if ($total <= 7) {
+        $pages = range(1, $total);
+      } else {
+        $pages[] = 1;
+        if ($current - 1 > 2) $pages[] = '...';
+        for ($i = max(2, $current-1); $i <= min($total-1, $current+1); $i++) $pages[] = $i;
+        if ($current + 1 < $total - 1) $pages[] = '...';
+        $pages[] = $total;
+      }
+    ?>
+      <nav class="flex flex-wrap justify-center items-center gap-1.5 text-sm">
+        <?php if ($current > 1): ?>
+          <a href="?<?= qs_orders($opts, ['p' => $current - 1]) ?>" class="h-9 px-2.5 inline-flex items-center justify-center rounded-md border border-silver-200 hover:bg-silver">←</a>
+        <?php endif; ?>
+        <?php foreach ($pages as $p): ?>
+          <?php if ($p === '...'): ?>
+            <span class="h-9 px-1 inline-flex items-center text-carbon-soft">…</span>
+          <?php else: ?>
+            <a href="?<?= qs_orders($opts, ['p' => $p]) ?>"
+               class="min-w-9 h-9 px-2.5 inline-flex items-center justify-center rounded-md border text-xs <?= $p === $current ? 'border-brand-500 bg-brand-500 text-white font-semibold' : 'border-silver-200 hover:bg-silver' ?>">
+              <?= $p ?>
+            </a>
+          <?php endif; ?>
+        <?php endforeach; ?>
+        <?php if ($current < $total): ?>
+          <a href="?<?= qs_orders($opts, ['p' => $current + 1]) ?>" class="h-9 px-2.5 inline-flex items-center justify-center rounded-md border border-silver-200 hover:bg-silver">→</a>
+        <?php endif; ?>
+      </nav>
+    <?php endif; ?>
+  <?php endif; ?>
+</div>

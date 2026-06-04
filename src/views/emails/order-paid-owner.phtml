@@ -1,0 +1,47 @@
+<?php
+/**
+ * Email a la dueña cuando entra una venta (PAID).
+ * Vars: $order, $items, $shipping_method, $adminUrl
+ */
+$headline = 'Nueva venta: ' . e(money((int)$order['total']));
+$intro    = '<strong>' . e($order['customer_name']) . '</strong> acaba de pagar el pedido <strong>' . e($order['order_number']) . '</strong>.';
+
+ob_start();
+require __DIR__ . '/_partials/order-items.phtml';
+$bodyHtml  = (string) ob_get_clean();
+
+// Bloque con datos del cliente para que la dueña coordine envío + facturación.
+$personLabel = ($order['customer_type'] ?? 'natural') === 'juridica' ? 'Persona jurídica' : 'Persona natural';
+$docType = $order['customer_doc_type'] ?? 'CC';
+
+$bodyHtml .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:18px;border:1px solid #ececec;border-radius:10px;font-size:13px;">'
+  . '<tr><td style="padding:14px;color:#525a5e;line-height:1.6;">'
+  . '<strong style="color:#1a1d1f;text-transform:uppercase;font-size:11px;letter-spacing:0.06em;">Datos del cliente</strong> '
+  . '<span style="display:inline-block;margin-left:6px;padding:2px 8px;background:#ecfdee;color:#1d8e23;font-size:10px;font-weight:700;border-radius:9999px;">' . e($personLabel) . '</span><br>'
+  . '<strong>' . e($order['customer_name']) . '</strong><br>'
+  . 'Documento: ' . e($docType) . ' <strong>' . e($order['customer_doc_id'] ?? '—') . '</strong><br>'
+  . 'Email: <a href="mailto:' . e($order['customer_email']) . '" style="color:#28b22e;text-decoration:none;">' . e($order['customer_email']) . '</a><br>'
+  . 'Tel: <a href="https://wa.me/57' . e(preg_replace('/\D/', '', $order['customer_phone']) ?: '') . '" style="color:#28b22e;text-decoration:none;">' . e($order['customer_phone']) . '</a>'
+  . '</td></tr>';
+
+if (!empty($order['billing_address'])) {
+    $bodyHtml .= '<tr><td style="padding:14px;border-top:1px solid #ececec;color:#525a5e;line-height:1.6;">'
+      . '<strong style="color:#1a1d1f;text-transform:uppercase;font-size:11px;letter-spacing:0.06em;">📄 Facturación</strong><br>'
+      . e($order['billing_address']) . '<br>'
+      . e($order['billing_city']) . ', ' . e($order['billing_state'])
+      . '</td></tr>';
+}
+
+$bodyHtml .= '<tr><td style="padding:14px;border-top:1px solid #ececec;color:#525a5e;line-height:1.6;">'
+  . '<strong style="color:#1a1d1f;text-transform:uppercase;font-size:11px;letter-spacing:0.06em;">'
+  . (($order['shipping_method'] ?? '') === 'bus' ? 'Recoge en' : 'Envía a')
+  . '</strong><br>'
+  . e($order['shipping_address']) . '<br>'
+  . e($order['shipping_city']) . ', ' . e($order['shipping_state'])
+  . (!empty($order['shipping_notes']) ? '<br><em style="color:#8a929a;">"' . e($order['shipping_notes']) . '"</em>' : '')
+  . '</td></tr></table>';
+
+$cta    = ['label' => 'Abrir en admin', 'url' => $adminUrl];
+$footer = 'Pago procesado vía ' . e($order['payment_method'] ?? 'Wompi') . ' · TX ' . e($order['payment_tx_id'] ?? '—');
+
+require __DIR__ . '/_partials/layout.phtml';

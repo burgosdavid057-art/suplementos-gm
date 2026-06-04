@@ -1,0 +1,92 @@
+<?php
+/** @var array $legal */
+require __DIR__ . '/_partials/layout.phtml';
+?>
+
+<h2>1. ¿Qué son las cookies?</h2>
+<p>
+  Las cookies son pequeños archivos de texto que un sitio web guarda en el navegador del usuario para
+  almacenar información necesaria para el funcionamiento del sitio o mejorar la experiencia de uso.
+</p>
+
+<h2>2. Cookies que utilizamos</h2>
+<p>
+  En <a href="https://<?= e($legal['domain']) ?>"><?= e($legal['domain']) ?></a> usamos únicamente
+  las cookies estrictamente necesarias para el funcionamiento del sitio:
+</p>
+
+<h3>2.1 Cookies técnicas / de sesión</h3>
+<table style="width:100%;border-collapse:collapse;margin-top:0.5rem;font-size:14px;">
+  <thead>
+    <tr style="background:#f5f6f7;">
+      <th style="text-align:left;padding:8px;border:1px solid #ececec;">Nombre</th>
+      <th style="text-align:left;padding:8px;border:1px solid #ececec;">Finalidad</th>
+      <th style="text-align:left;padding:8px;border:1px solid #ececec;">Duración</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding:8px;border:1px solid #ececec;"><code>sgm_session</code></td>
+      <td style="padding:8px;border:1px solid #ececec;">Identifica la sesión del usuario (CSRF, carrito en servidor).</td>
+      <td style="padding:8px;border:1px solid #ececec;">Sesión (se borra al cerrar el navegador)</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;border:1px solid #ececec;"><code>sgm_cookies_ok</code></td>
+      <td style="padding:8px;border:1px solid #ececec;">Recuerda que el usuario aceptó el banner de cookies.</td>
+      <td style="padding:8px;border:1px solid #ececec;">12 meses</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>2.2 LocalStorage (no es una cookie, pero se almacena en el navegador)</h3>
+<p>
+  Usamos <code>localStorage</code> para guardar:
+</p>
+<ul>
+  <li><strong>Carrito de compras temporal</strong> — los productos que el usuario añade antes de
+      completar el checkout. Esta información nunca se envía a nuestros servidores hasta que se
+      finaliza la compra.</li>
+</ul>
+
+<h3>2.3 Cookies de terceros</h3>
+<p>
+  Cuando el usuario procede al pago, es redirigido a la pasarela <strong>Wompi</strong>, que utiliza
+  sus propias cookies para procesar la transacción. Estas cookies se rigen por la política de privacidad
+  de Wompi y no las controlamos.
+</p>
+
+<h2>3. Cookies que NO utilizamos</h2>
+<p>
+  <strong>No usamos cookies de publicidad, marketing, perfilamiento ni de análisis de terceros
+  (Google Analytics, Meta Pixel, etc.)</strong> en esta versión del sitio.
+</p>
+
+<h2>4. Cómo gestionar las cookies</h2>
+<p>
+  El usuario puede aceptar, rechazar, bloquear o eliminar las cookies a través de la configuración de
+  su navegador:
+</p>
+<ul>
+  <li><strong>Chrome:</strong> Configuración → Privacidad y seguridad → Cookies</li>
+  <li><strong>Firefox:</strong> Preferencias → Privacidad y seguridad → Cookies y datos del sitio</li>
+  <li><strong>Safari:</strong> Preferencias → Privacidad → Gestionar datos de sitios web</li>
+  <li><strong>Edge:</strong> Configuración → Cookies y permisos del sitio</li>
+</ul>
+<p>
+  <strong>Nota:</strong> Si deshabilita las cookies técnicas, algunas funciones del sitio (como el
+  carrito, el checkout o el login del administrador) pueden dejar de funcionar correctamente.
+</p>
+
+<h2>5. Cambios a este aviso</h2>
+<p>
+  Cualquier modificación a este aviso será publicada en esta misma página. Recomendamos al usuario
+  revisarlo periódicamente.
+</p>
+
+<h2>6. Contacto</h2>
+<p>
+  Para cualquier consulta sobre cookies u otras tecnologías de seguimiento:
+  <a href="mailto:<?= e($legal['email']) ?>"><?= e($legal['email']) ?></a>
+</p>
+
+<?php require __DIR__ . '/_partials/layout-end.phtml'; ?>

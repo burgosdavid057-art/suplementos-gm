@@ -1,0 +1,19 @@
+<?php
+/** @var string $title */
+/** @var string $message */
+?><!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title><?= e($title) ?> — Suplementos GM</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/tailwind.css">
+<link rel="stylesheet" href="/assets/site.css">
+</head><body class="bg-silver text-carbon min-h-screen">
+  <div class="min-h-screen grid place-items-center px-6 text-center">
+    <div class="max-w-md">
+      <div class="text-7xl md:text-8xl font-black brand-text-glow mb-4"><?= e($title) ?></div>
+      <p class="text-lg text-carbon-soft mb-8"><?= e($message) ?></p>
+      <a href="/" class="btn-primary">Volver al inicio →</a>
+    </div>
+  </div>
+</body></html>

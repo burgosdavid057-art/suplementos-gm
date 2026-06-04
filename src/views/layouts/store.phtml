@@ -1,0 +1,174 @@
+<?php
+/** @var string $content */
+/** @var string $title */
+/** @var ?string $description */
+$title       = $title       ?? 'Suplementos GM';
+$description = $description ?? 'Suplementos e insumos veterinarios para caballos. Envíos a todo Colombia.';
+$cats        = Category::all();
+$current     = $_SERVER['REQUEST_URI'] ?? '/';
+
+// Cache buster: timestamp del archivo en disco. Cuando editamos un asset, su
+// mtime cambia y el navegador descarga la versión nueva sin tener que
+// invalidar manualmente.
+$assetVer = function (string $path): string {
+    $abs = dirname(__DIR__, 2) . '/../httpdocs' . $path;
+    return is_file($abs) ? (string) filemtime($abs) : '0';
+};
+?><!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><?= e($title) ?></title>
+<meta name="description" content="<?= e($description) ?>">
+<meta property="og:title" content="<?= e($title) ?>">
+<meta property="og:description" content="<?= e($description) ?>">
+<meta property="og:type" content="website">
+<meta property="og:url" content="<?= e($_SERVER['REQUEST_URI'] ? url(ltrim($_SERVER['REQUEST_URI'], '/')) : url('/')) ?>">
+<link rel="icon" type="image/png" sizes="32x32"  href="/assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+<link rel="shortcut icon" href="/assets/favicon.png">
+<meta name="theme-color" content="#28b22e">
+
+<script>
+  (function () {
+    try {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      document.documentElement.classList.add('js-anim');
+    } catch (e) {}
+  })();
+</script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/tailwind.css?v=<?= e($assetVer('/assets/tailwind.css')) ?>">
+<link rel="stylesheet" href="/assets/site.css?v=<?= e($assetVer('/assets/site.css')) ?>">
+<script src="/assets/cart.js?v=<?= e($assetVer('/assets/cart.js')) ?>" defer></script>
+<script src="/assets/nav.js?v=<?= e($assetVer('/assets/nav.js')) ?>" defer></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script defer src="/assets/animations.js?v=<?= e($assetVer('/assets/animations.js')) ?>"></script>
+</head>
+<body class="bg-white text-carbon antialiased">
+
+<?php require __DIR__ . '/../partials/header.phtml'; ?>
+
+<?php if ($f = flash('ok')): ?>
+  <div class="bg-brand-50 border-b border-brand-200 text-brand-900 text-sm py-2 text-center"><?= e($f) ?></div>
+<?php endif; ?>
+<?php if ($f = flash('err')): ?>
+  <div class="bg-red-50 border-b border-red-200 text-red-900 text-sm py-2 text-center"><?= e($f) ?></div>
+<?php endif; ?>
+
+<main class="min-h-[60vh]">
+  <?= $content ?>
+</main>
+
+<footer class="bg-carbon text-white">
+  <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 py-14 grid grid-cols-1 md:grid-cols-4 gap-10 text-sm">
+    <div class="md:col-span-2">
+      <div class="flex items-center">
+        <img src="/assets/logo-gm.png" alt="Suplementos GM" class="brand-logo-footer">
+      </div>
+      <p class="mt-4 text-white/70 max-w-md leading-relaxed">
+        Suplementos e insumos veterinarios para caballos seleccionados con
+        criterio profesional. Atendemos criadores, jinetes y veterinarios
+        en toda Colombia.
+      </p>
+      <div class="mt-5 flex gap-3">
+        <a href="https://wa.me/573105043520" target="_blank" rel="noreferrer"
+           class="inline-flex items-center gap-2 px-4 h-10 rounded-full bg-brand-500 hover:bg-brand-600 text-white font-semibold transition">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448L.057 24z"/></svg>
+          WhatsApp
+        </a>
+        <a href="mailto:pedidos@suplementosequinosgm.co"
+           class="inline-flex items-center gap-2 px-4 h-10 rounded-full border border-white/20 hover:border-white/60 transition">
+          Email
+        </a>
+      </div>
+    </div>
+
+    <div>
+      <div class="font-bold mb-4 text-white">Tienda</div>
+      <ul class="space-y-2 text-white/70">
+        <li><a href="/productos" class="hover:text-brand-400 transition">Catálogo completo</a></li>
+        <?php foreach (array_slice($cats, 0, 4) as $c): ?>
+          <li><a href="/productos?categoria=<?= e($c['slug']) ?>" class="hover:text-brand-400 transition"><?= e($c['name']) ?></a></li>
+        <?php endforeach; ?>
+      </ul>
+    </div>
+
+    <div>
+      <div class="font-bold mb-4 text-white">Soporte</div>
+      <ul class="space-y-2 text-white/70">
+        <li><a href="/orden" class="hover:text-brand-400 transition">Estado de mi pedido</a></li>
+        <li><a href="https://wa.me/573105043520" class="hover:text-brand-400 transition">Asesoría WhatsApp</a></li>
+        <li><a href="/admin/login" class="hover:text-brand-400 transition">Acceso administrador</a></li>
+      </ul>
+      <div class="font-bold mt-6 mb-4 text-white">Legal</div>
+      <ul class="space-y-2 text-white/70">
+        <li><a href="/legal/terminos" class="hover:text-brand-400 transition">Términos y Condiciones</a></li>
+        <li><a href="/legal/privacidad" class="hover:text-brand-400 transition">Privacidad y Datos Personales</a></li>
+        <li><a href="/legal/devoluciones" class="hover:text-brand-400 transition">Devoluciones</a></li>
+        <li><a href="/legal/cookies" class="hover:text-brand-400 transition">Aviso de Cookies</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="border-t border-white/10">
+    <div class="max-w-6xl mx-auto px-6 py-5 flex flex-col md:flex-row items-center justify-between gap-2 text-xs text-white/50">
+      <div>© <?= date('Y') ?> Suplementos GM · Todos los derechos reservados</div>
+      <div>Hecho con cariño para los caballos colombianos</div>
+    </div>
+  </div>
+</footer>
+
+<!-- Banner de cookies (aparece solo si no se aceptó antes) -->
+<div id="cookie-banner" class="hidden fixed bottom-3 left-3 right-3 sm:left-auto sm:right-6 sm:bottom-6 sm:max-w-md z-50 rounded-2xl bg-white shadow-2xl border border-silver-200 p-4 sm:p-5">
+  <div class="flex items-start gap-3">
+    <div class="shrink-0 w-9 h-9 rounded-full bg-brand-50 text-brand-700 flex items-center justify-center">
+      <?= icon('info', 'w-5 h-5') ?>
+    </div>
+    <div class="flex-1 min-w-0">
+      <p class="text-sm font-bold text-carbon">Usamos cookies técnicas</p>
+      <p class="mt-1 text-xs text-carbon-soft leading-relaxed">
+        Solo las estrictamente necesarias para que la tienda funcione (sesión, carrito, login).
+        No usamos cookies de marketing ni rastreo de terceros.
+        <a href="/legal/cookies" class="text-brand-700 hover:underline font-medium">Más info</a>.
+      </p>
+      <div class="mt-3 flex gap-2">
+        <button type="button" id="cookie-accept"
+                class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 rounded-md bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold transition">
+          Entendido
+        </button>
+        <a href="/legal/cookies"
+           class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 rounded-md border border-silver-200 hover:border-brand-500 text-sm transition">
+          Ver detalles
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Banner de cookies: aparece una sola vez; se oculta cuando el usuario acepta.
+  // Se persiste en localStorage (no en cookie, para no requerir consentimiento
+  // para guardar el propio consentimiento — paradoja resuelta).
+  (function () {
+    var KEY = 'sgm_cookies_ok';
+    var banner = document.getElementById('cookie-banner');
+    var btn    = document.getElementById('cookie-accept');
+    if (!banner || !btn) return;
+    try {
+      if (localStorage.getItem(KEY) === '1') return;
+    } catch (e) {}
+    banner.classList.remove('hidden');
+    btn.addEventListener('click', function () {
+      try { localStorage.setItem(KEY, '1'); } catch (e) {}
+      banner.classList.add('hidden');
+    });
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,16 @@
+<?php
+/**
+ * Email al cliente cuando se crea la orden (estado PENDING).
+ * Vars: $order, $items, $shipping_method, $orderUrl
+ */
+$headline = 'Hola ' . e(explode(' ', $order['customer_name'])[0] ?? 'jinete') . ',';
+$intro    = 'Recibimos tu pedido <strong>' . e($order['order_number']) . '</strong>. Para terminar la compra, completa el pago desde el siguiente botón.';
+
+ob_start();
+require __DIR__ . '/_partials/order-items.phtml';
+$bodyHtml = (string) ob_get_clean();
+
+$cta = ['label' => 'Pagar pedido', 'url' => $orderUrl];
+$footer = 'Reservamos tu pedido por 24 horas. Si necesitas más tiempo o prefieres pagar contraentrega, escríbenos.';
+
+require __DIR__ . '/_partials/layout.phtml';

@@ -1,0 +1,51 @@
+<?php
+/** @var string $content */
+/** @var string $title */
+$user = admin_user();
+$current = $_SERVER['REQUEST_URI'] ?? '/admin';
+?><!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title><?= e($title) ?> — Admin Suplementos GM</title>
+<link rel="icon" type="image/png" sizes="32x32"  href="/assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+<link rel="shortcut icon" href="/assets/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/tailwind.css">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body class="bg-silver text-carbon">
+<div class="flex min-h-screen">
+  <aside class="w-64 bg-carbon text-white p-5 flex flex-col flex-shrink-0">
+    <a href="/admin" class="font-extrabold text-base mb-8 flex items-center gap-2.5">
+      <img src="/assets/logo-gm.png" alt="" class="brand-logo-admin bg-white rounded-lg p-1">
+      <span class="text-white/90">Admin</span>
+    </a>
+    <nav class="flex flex-col gap-1 text-sm">
+      <a href="/admin" class="inline-flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-white/10 transition <?= $current === '/admin' ? 'bg-white/10 font-semibold' : 'text-white/80' ?>"><?= icon('bar-chart', 'w-4 h-4') ?> Dashboard</a>
+      <a href="/admin/productos" class="inline-flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-white/10 transition <?= str_starts_with($current, '/admin/productos') ? 'bg-white/10 font-semibold' : 'text-white/80' ?>"><?= icon('package', 'w-4 h-4') ?> Productos</a>
+      <a href="/admin/categorias" class="inline-flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-white/10 transition <?= str_starts_with($current, '/admin/categorias') ? 'bg-white/10 font-semibold' : 'text-white/80' ?>"><?= icon('folder', 'w-4 h-4') ?> Categorías</a>
+      <a href="/admin/pedidos" class="inline-flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-white/10 transition <?= str_starts_with($current, '/admin/pedidos') ? 'bg-white/10 font-semibold' : 'text-white/80' ?>"><?= icon('cart', 'w-4 h-4') ?> Pedidos</a>
+      <a href="/admin/emails" class="inline-flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-white/10 transition <?= str_starts_with($current, '/admin/emails') ? 'bg-white/10 font-semibold' : 'text-white/80' ?>"><?= icon('mail', 'w-4 h-4') ?> Emails</a>
+    </nav>
+    <div class="mt-auto pt-5 border-t border-white/10 text-xs">
+      <div class="text-white/70 mb-3 truncate"><?= e($user['email'] ?? '') ?></div>
+      <form method="post" action="/admin/logout" class="mb-2">
+        <?= csrf_field() ?>
+        <button class="text-white/80 hover:text-white">Cerrar sesión →</button>
+      </form>
+      <a href="/" class="block text-white/60 hover:text-white">← Ver tienda</a>
+    </div>
+  </aside>
+  <div class="flex-1 p-8 max-w-6xl">
+    <?php if ($f = flash('ok')): ?>
+      <div class="mb-6 rounded-lg bg-brand-50 border border-brand-200 text-brand-900 px-4 py-3"><?= e($f) ?></div>
+    <?php endif; ?>
+    <?php if ($f = flash('err')): ?>
+      <div class="mb-6 rounded-lg bg-red-50 border border-red-200 text-red-900 px-4 py-3"><?= e($f) ?></div>
+    <?php endif; ?>
+    <?= $content ?>
+  </div>
+</div>
+</body></html>
