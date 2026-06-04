@@ -7,9 +7,9 @@
 *.p12
 *.secret
 
-# Claude
-CLAUDE.md
+# Editor config
 .claude/
+*.md.bak
 
 # PHP
 vendor/
