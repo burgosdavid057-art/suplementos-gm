@@ -1,41 +1,25 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Sincroniza Alegra → BD local.
- *
- * Reglas (mismas que el Next.js):
- *   - Solo importa items type=product / consumer-good (no servicios).
- *   - Crea categorías locales bajo demanda con slug auto-generado.
- *   - Si el producto ya existe en local (por alegraId), actualiza name/desc/
- *     price/stock/categoryId. Respeta `featured` y `brand` ya editados manualmente.
- *   - Imágenes: Alegra es la fuente de verdad. Si el set de imágenes en Alegra
- *     cambió (detectado por firma sha1), se re-hace el mirror a Cloudinary.
- *     Excepción: productos con images_locked=1 (foto subida/curada a mano desde
- *     /admin) — esos NUNCA se sobrescriben. Si Alegra no trae imágenes, tampoco
- *     se toca lo que haya local.
- *   - Si Alegra dice status=inactive, oculta el producto local. No re-activa
- *     productos que la dueña haya pausado manualmente.
- */
 class AlegraSync {
     private const LOCK_FILE = __DIR__ . '/../../data/.alegra-sync.lock';
     private const LOG_FILE  = __DIR__ . '/../../data/alegra-sync.log';
-    private const STALE_LOCK_SECONDS = 1800; // 30 min — si el lock es más viejo, lo ignoramos
+    private const STALE_LOCK_SECONDS = 1800; 
 
-    /** True si hay un sync corriendo ahora mismo (lock fresco). */
+    
     public static function isRunning(): bool {
         if (!is_file(self::LOCK_FILE)) return false;
         $age = time() - (int) filemtime(self::LOCK_FILE);
         return $age < self::STALE_LOCK_SECONDS;
     }
 
-    /** Hora de inicio del sync en curso (o null). */
+    
     public static function lockStartedAt(): ?int {
         if (!is_file(self::LOCK_FILE)) return null;
         return (int) filemtime(self::LOCK_FILE);
     }
 
-    /** Devuelve las últimas N líneas del log de sync. */
+    
     public static function tailLog(int $lines = 30): string {
         if (!is_file(self::LOG_FILE)) return '';
         $content = (string) file_get_contents(self::LOG_FILE);
@@ -44,16 +28,9 @@ class AlegraSync {
         return implode("\n", $arr);
     }
 
-    /**
-     * @return array{
-     *   fetched:int, created:int, updated:int, skipped:int,
-     *   categories_created:int, images_imported:int,
-     *   errors:array<int,array{id:string,message:string}>,
-     *   duration_ms:int
-     * }
-     */
+    
     public static function run(?callable $onProgress = null): array {
-        // Adquirir lock — si ya hay uno fresco, abortar.
+        
         @mkdir(dirname(self::LOCK_FILE), 0775, true);
         $lockFp = @fopen(self::LOCK_FILE, 'c');
         if ($lockFp === false || !@flock($lockFp, LOCK_EX | LOCK_NB)) {
@@ -63,7 +40,7 @@ class AlegraSync {
         @ftruncate($lockFp, 0);
         @fwrite($lockFp, (string) getmypid() . "\n");
         @fflush($lockFp);
-        // touch para que filemtime() refleje "ahora"
+        
         @touch(self::LOCK_FILE);
 
         try {
@@ -90,7 +67,7 @@ class AlegraSync {
 
         self::log('=== Sync iniciado ===');
 
-        // Wrapper del progress que loguea cada página y propaga al callback original.
+        
         $progressLog = function (int $start, int $count) use ($onProgress) {
             self::log("Página start=$start: $count items recibidos");
             if ($onProgress) $onProgress($start, $count);
@@ -113,16 +90,16 @@ class AlegraSync {
             $alegraId = (string) ($item['id'] ?? '');
             if ($alegraId === '') continue;
 
-            // Checkpoint WAL periódico: en corridas largas (mirror de imágenes)
-            // el WAL puede crecer y disparar contención de checkpoint. Lo vaciamos
-            // cada 40 items con un checkpoint pasivo (no bloquea lectores).
+            
+            
+            
             if ($processed > 0 && $processed % 40 === 0) {
                 try { $pdo->exec('PRAGMA wal_checkpoint(PASSIVE)'); } catch (Throwable $e) {}
             }
             $processed++;
 
             try {
-                // Saltar servicios — solo productos físicos.
+                
                 $type = $item['type'] ?? 'product';
                 if ($type !== 'product' && $type !== 'consumer-good') {
                     $result['skipped']++;
@@ -139,22 +116,22 @@ class AlegraSync {
                 $isActiveAle = (($item['status'] ?? 'active') === 'active');
                 $alegraImgs  = Alegra::extractImageUrls($item);
 
-                // Buscar por alegraId (incluyendo images/lock/firma para decidir mirror)
+                
                 $stmt = $pdo->prepare('SELECT id, brand, active, images, images_locked, alegra_images_sig FROM products WHERE alegra_id = ? LIMIT 1');
                 $stmt->execute([$alegraId]);
                 $existing = $stmt->fetch();
 
                 if ($existing) {
-                    // Solo campos del ERP. Featured/brand-manual se respetan.
+                    
                     $newBrand  = $existing['brand'] ?: $brand;
                     $newActive = $isActiveAle ? (int)$existing['active'] : 0;
 
-                    // ── Imágenes ──────────────────────────────────────
-                    // Refrescamos desde Alegra cuando:
-                    //   - el producto NO está bloqueado a mano (images_locked=0), y
-                    //   - Alegra trae imágenes, y
-                    //   - el set de imágenes cambió respecto al último mirror.
-                    // La firma evita re-subir a Cloudinary en cada corrida del cron.
+                    
+                    
+                    
+                    
+                    
+                    
                     $locked    = ((int)($existing['images_locked'] ?? 0)) === 1;
                     $sig       = Alegra::imagesFingerprint($item);
                     $storedSig = $existing['alegra_images_sig'] ?? null;
@@ -177,8 +154,8 @@ class AlegraSync {
                             $result['updated']++;
                             continue;
                         }
-                        // Si el mirror falló (descarga/upload), NO tocamos imágenes
-                        // ni firma: caemos al UPDATE normal y reintentamos luego.
+                        
+                        
                     }
 
                     $stmt = $pdo->prepare('UPDATE products SET
@@ -232,12 +209,7 @@ class AlegraSync {
         return $result;
     }
 
-    /**
-     * Descarga imágenes desde Alegra y las espeja a Cloudinary.
-     * Retorna el array de URLs definitivas en Cloudinary (en el mismo orden).
-     * Si Cloudinary no está configurado o falla todo, retorna [] y la dueña
-     * tendrá que subir las fotos manualmente desde /admin.
-     */
+    
     private static function mirrorImages(array $alegraUrls, string $productId): array {
         if (!Cloudinary::isFullyConfigured()) return [];
 
@@ -253,21 +225,16 @@ class AlegraSync {
                 $secure   = Cloudinary::uploadBytes($bytes, $publicId, $mime, 'alegra-sync');
                 if ($secure) $out[] = $secure;
             } catch (Throwable $e) {
-                // No interrumpir el sync por una imagen fallida.
+                
             }
             $idx++;
-            // Pequeña pausa para no saturar Cloudinary.
+            
             usleep(120_000);
         }
         return $out;
     }
 
-    /**
-     * Ejecuta un statement de escritura con reintentos ante "database is locked".
-     * El busy_timeout del PDO ya espera dentro de cada execute(); esto añade
-     * reintentos con backoff para los casos de contención de WAL/checkpoint que
-     * devuelven BUSY inmediato sin invocar el busy handler.
-     */
+    
     private static function runStmt(PDOStatement $stmt, array $params, int $tries = 5): void {
         for ($i = 0; ; $i++) {
             try {
@@ -279,7 +246,7 @@ class AlegraSync {
                        || str_contains($msg, 'database is busy')
                        || str_contains($msg, 'database table is locked');
                 if (!$isLock || $i >= $tries - 1) throw $e;
-                // backoff: 200ms, 400, 800, 1600 ms
+                
                 usleep(200_000 * (1 << $i));
             }
         }
@@ -300,7 +267,7 @@ class AlegraSync {
             return $existing['id'];
         }
 
-        // Crear
+        
         $id = db_id();
         $stmt = db()->prepare('INSERT INTO categories (id, name, slug, description, "order")
                                VALUES (?,?,?,?,100)');
@@ -310,9 +277,7 @@ class AlegraSync {
         return $id;
     }
 
-    /**
-     * Asegura que el slug sea único. Si choca con OTRO producto, agrega sufijo numérico.
-     */
+    
     private static function ensureUniqueSlug(string $name, string $alegraId): string {
         $root = slug($name) ?: ('producto-' . $alegraId);
         $slug = $root;

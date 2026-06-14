@@ -1,23 +1,6 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Auditoría de imágenes: compara la foto que tiene cada producto en la BD local
- * contra la que entrega Alegra AHORA, y reporta desajustes.
- *
- * NO escribe nada (solo lectura). Uso:
- *   php scripts/audit-images.php          → resumen + lista de desajustes
- *   php scripts/audit-images.php --csv    → salida CSV para revisar en detalle
- *
- * Categorías:
- *   OK            → la firma local coincide con la de Alegra (foto al día)
- *   DESACTUALIZADO→ Alegra tiene imágenes pero la firma local no coincide
- *                   (el próximo sync lo arregla; si persiste, ver --reset abajo)
- *   BLOQUEADO     → images_locked=1: se conserva la foto manual a propósito
- *   SIN_FOTO_ALEGRA→ Alegra no tiene imágenes para ese producto
- *   FALTA_EN_BD   → el item de Alegra no existe como producto local
- */
-
 require_once __DIR__ . '/../src/bootstrap.php';
 
 if (!Alegra::isConfigured()) {
@@ -25,7 +8,6 @@ if (!Alegra::isConfigured()) {
     exit(1);
 }
 
-// Misma firma ESTABLE que usa AlegraSync (id de imagen / ruta sin query firmada).
 function img_sig(array $item): string {
     return Alegra::imagesFingerprint($item);
 }

@@ -37,9 +37,7 @@ class Product {
         return $row ? self::decode($row) : null;
     }
 
-    /**
-     * Listado público con filtros opcionales.
-     */
+    
     public static function list(array $opts = []): array {
         $where = ['p.active = 1'];
         $args  = [];
@@ -102,9 +100,7 @@ class Product {
         ];
     }
 
-    /**
-     * Listado completo del admin (ignora active=1, permite filtrar por categoría/búsqueda).
-     */
+    
     public static function adminList(array $opts = []): array {
         $where = ['1=1'];
         $args  = [];
@@ -148,7 +144,7 @@ class Product {
         ")->fetchAll(PDO::FETCH_COLUMN);
     }
 
-    // ─── CRUD ────────────────────────────────────────────
+    
 
     public static function create(array $data): string {
         $id = db_id();

@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 class Admin {
-    // ─── Dashboard ───────────────────────────────────────
+    
     public static function dashboard(): void {
         require_admin();
         $pdo = db();
@@ -36,7 +36,7 @@ class Admin {
         ], 'layouts/admin');
     }
 
-    // ─── Productos: listado ─────────────────────────────
+    
     public static function productosIndex(): void {
         require_admin();
         $opts = [
@@ -56,11 +56,11 @@ class Admin {
         ], 'layouts/admin');
     }
 
-    // ─── Productos: sync con Alegra (lanzado en background) ─
-    // El sync con mirror de imágenes puede tardar varios minutos. Para no
-    // colgar el navegador (504 Gateway Timeout), lanzamos el script CLI en
-    // background y volvemos al admin de inmediato. El estado se ve en el
-    // dashboard ("Última sync: hace X min").
+    
+    
+    
+    
+    
     public static function productosSync(): void {
         require_admin();
         csrf_check();
@@ -85,7 +85,7 @@ class Admin {
             redirect('/admin/productos');
         }
 
-        // Lanza en background y desconecta stdout/stderr → el browser no espera.
+        
         $cmd = sprintf('nohup %s %s > /dev/null 2>&1 &',
             escapeshellcmd($php), escapeshellarg($script));
         @exec($cmd);
@@ -94,7 +94,7 @@ class Admin {
         redirect('/admin/productos');
     }
 
-    // ─── Productos: toggle activo ───────────────────────
+    
     public static function productosToggle(string $id): void {
         require_admin();
         csrf_check();
@@ -105,7 +105,7 @@ class Admin {
         redirect('/admin/productos');
     }
 
-    // ─── Productos: borrar ──────────────────────────────
+    
     public static function productosDelete(string $id): void {
         require_admin();
         csrf_check();
@@ -116,7 +116,7 @@ class Admin {
         redirect('/admin/productos');
     }
 
-    // ─── Productos: form nuevo ──────────────────────────
+    
     public static function productosNuevo(): void {
         require_admin();
         render_layout('admin/productos/form', [
@@ -128,7 +128,7 @@ class Admin {
         ], 'layouts/admin');
     }
 
-    // ─── Productos: crear ───────────────────────────────
+    
     public static function productosCreate(): void {
         require_admin();
         csrf_check();
@@ -153,7 +153,7 @@ class Admin {
         redirect("/admin/productos/$id");
     }
 
-    // ─── Productos: form editar ─────────────────────────
+    
     public static function productosEdit(string $id): void {
         require_admin();
         $product = Product::findById($id);
@@ -168,7 +168,7 @@ class Admin {
         ], 'layouts/admin');
     }
 
-    // ─── Productos: actualizar ──────────────────────────
+    
     public static function productosUpdate(string $id): void {
         require_admin();
         csrf_check();
@@ -195,7 +195,7 @@ class Admin {
         redirect("/admin/productos/$id");
     }
 
-    // ─── Categorías: listado + create ───────────────────
+    
     public static function categoriasIndex(): void {
         require_admin();
         render_layout('admin/categorias/index', [
@@ -254,7 +254,7 @@ class Admin {
         redirect('/admin/categorias');
     }
 
-    // ─── Pedidos (placeholder) ──────────────────────────
+    
     public static function pedidosIndex(): void {
         require_admin();
         $opts = [
@@ -300,7 +300,7 @@ class Admin {
         $tracking = Input::text('tracking_number', 80);
 
         Order::markShipped($id, $carrier, $tracking);
-        // Email al cliente con la info de envío. No-op silencioso si Resend falla.
+        
         try {
             $fresh = Order::findById($id);
             if ($fresh) OrderMailer::notifyShipped($fresh, Order::items($id));
@@ -327,7 +327,7 @@ class Admin {
         $order = Order::findById($id);
         if (!$order) not_found('Pedido no existe');
         Order::markCancelled($id);
-        // Avisar al cliente
+        
         try {
             $fresh = Order::findById($id);
             if ($fresh) OrderMailer::notifyCancelled($fresh, Order::items($id));
@@ -349,7 +349,7 @@ class Admin {
         redirect('/admin/pedidos/' . $id);
     }
 
-    // ─── Emails: log + reenviar + test ──────────────────
+    
     public static function emailsIndex(): void {
         require_admin();
         render_layout('admin/emails/index', [
@@ -361,7 +361,7 @@ class Admin {
         ], 'layouts/admin');
     }
 
-    /** POST /admin/emails/test — manda un email de prueba al admin. */
+    
     public static function emailsTest(): void {
         require_admin();
         csrf_check();
@@ -387,7 +387,7 @@ class Admin {
         redirect('/admin/emails');
     }
 
-    /** POST /admin/pedidos/{id}/resend-email — reenvía un email a partir de una orden. */
+    
     public static function pedidoResendEmail(string $id): void {
         require_admin();
         csrf_check();
@@ -404,16 +404,16 @@ class Admin {
         redirect('/admin/pedidos');
     }
 
-    // ─── Helpers de validación ──────────────────────────
+    
     private static function extractProductData(array $post): array {
-        // Imágenes vienen como textarea con una URL por línea. Solo aceptamos
-        // URLs http/https en hosts permitidos (Cloudinary + nuestro propio
-        // dominio para assets locales).
+        
+        
+        
         $images = [];
         $imagesRaw = is_string($post['images'] ?? null)
             ? (string) $post['images']
             : '';
-        $imagesRaw = mb_substr($imagesRaw, 0, 20_000, 'UTF-8'); // tope total
+        $imagesRaw = mb_substr($imagesRaw, 0, 20_000, 'UTF-8'); 
         if ($imagesRaw !== '') {
             $allowedHosts = ['res.cloudinary.com', 'suplementosequinosgm.co'];
             foreach (preg_split('/[\r\n]+/', $imagesRaw) ?: [] as $line) {
@@ -433,7 +433,7 @@ class Admin {
                 }
                 if (!$hostOk) continue;
                 $images[] = $valid;
-                if (count($images) >= 20) break; // máx 20 imágenes
+                if (count($images) >= 20) break; 
             }
         }
 
@@ -441,7 +441,7 @@ class Admin {
         $slugRaw     = Input::text('slug', 120, $post)              ?? '';
         $description = Input::textArea('description', 5000, $post)  ?? '';
         $brand       = Input::text('brand', 80, $post)              ?? '';
-        // category_id es un ID interno (formato cuid-like) — limit a alfanumérico
+        
         $catId       = Input::text('category_id', 40, $post)        ?? '';
         $catId       = preg_replace('/[^a-zA-Z0-9]/', '', $catId)   ?? '';
 
@@ -474,9 +474,9 @@ class Admin {
     private static function extractCategoryData(array $post): array {
         $name      = Input::text('name', 80, $post) ?? '';
         $slugInput = Input::text('slug', 120, $post);
-        // Si no dieron slug, generarlo del nombre.
+        
         $slugSrc = $slugInput !== null && $slugInput !== '' ? $slugInput : $name;
-        // image_url: solo aceptamos URLs en hosts permitidos
+        
         $imageUrl = Input::urlInHosts('image_url',
             ['res.cloudinary.com', 'suplementosequinosgm.co'],
             2048, $post) ?? '';
@@ -497,10 +497,7 @@ class Admin {
         return $e;
     }
 
-    /**
-     * Sanea un ID de URL (route param). Permite alfanumérico + guion.
-     * Se llama explícitamente en cada handler que recibe $id como param.
-     */
+    
     private static function safeId(string $id, int $maxLen = 40): string {
         $clean = preg_replace('/[^a-zA-Z0-9\-]/', '', $id) ?? '';
         return mb_substr($clean, 0, $maxLen, 'UTF-8');

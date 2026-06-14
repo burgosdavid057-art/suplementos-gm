@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
 
-// Auth admin. Sesiones PHP + bcrypt. Sin frameworks.
-
 function admin_user(): ?array {
     if (empty($_SESSION['admin_id'])) return null;
     static $cache = null;

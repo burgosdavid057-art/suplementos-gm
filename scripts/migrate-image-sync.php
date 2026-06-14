@@ -1,26 +1,10 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Migración aditiva: habilita la re-sincronización de imágenes desde Alegra.
- *
- *   - images_locked      (INTEGER 0/1)  → si 1, el sync NO toca las imágenes.
- *   - alegra_images_sig  (TEXT)         → firma del último set de imágenes
- *                                          mirror-eado desde Alegra (evita
- *                                          re-subir a Cloudinary en cada cron).
- *
- * Backfill: bloquea (images_locked=1) los productos cuyas imágenes NO provienen
- * del mirror de Alegra (carpeta 'alegra-sync'), es decir, fotos subidas a mano
- * o assets locales — para no sobrescribirlas en el primer sync.
- *
- * Idempotente: se puede correr varias veces sin daño.
- */
-
 require_once __DIR__ . '/../src/bootstrap.php';
 
 $pdo = db();
 
-// ─── Columnas existentes ────────────────────────────────
 $cols = [];
 foreach ($pdo->query('PRAGMA table_info(products)') as $row) {
     $cols[$row['name']] = true;
@@ -42,9 +26,6 @@ if (!isset($cols['alegra_images_sig'])) {
     echo "· alegra_images_sig ya existe\n";
 }
 
-// ─── Backfill: bloquear fotos NO provenientes de Alegra ──
-// Las imágenes mirror-eadas viven en la carpeta 'alegra-sync' de Cloudinary.
-// Cualquier otra cosa (foto manual, asset local) se considera manual → bloquear.
 $stmt = $pdo->prepare("
     UPDATE products
     SET images_locked = 1
@@ -56,7 +37,6 @@ $stmt->execute();
 $locked = $stmt->rowCount();
 echo "✓ Productos bloqueados (foto manual/local protegida): $locked\n";
 
-// ─── Resumen ─────────────────────────────────────────────
 $total   = (int) $pdo->query('SELECT COUNT(*) FROM products')->fetchColumn();
 $lockedN = (int) $pdo->query('SELECT COUNT(*) FROM products WHERE images_locked = 1')->fetchColumn();
 $freeImg = (int) $pdo->query("SELECT COUNT(*) FROM products WHERE images_locked = 0 AND images != '[]'")->fetchColumn();

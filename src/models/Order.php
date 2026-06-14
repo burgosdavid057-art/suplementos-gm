@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 class Order {
-    // ─── Estadísticas (admin) ──────────────────────────────
+    
 
     public static function counts(): array {
         $pdo = db();
@@ -61,7 +61,7 @@ class Order {
         return (int) db()->query("SELECT COUNT(*) FROM products WHERE alegra_id IS NOT NULL")->fetchColumn();
     }
 
-    // ─── Lookup ────────────────────────────────────────────
+    
 
     public static function findByNumber(string $orderNumber): ?array {
         $s = db()->prepare('SELECT * FROM orders WHERE order_number = ? LIMIT 1');
@@ -83,15 +83,9 @@ class Order {
         return $s->fetchAll();
     }
 
-    // ─── Creación ──────────────────────────────────────────
+    
 
-    /**
-     * Crea una orden con sus items en una transacción atómica.
-     *
-     * @param array $data    customer_*, billing_*, shipping_*, subtotal, shipping_cost, total
-     * @param array $items   [{product_id, product_name, product_price, quantity, subtotal}, ...]
-     * @return array         ['id' => ..., 'order_number' => ...]
-     */
+    
     public static function create(array $data, array $items): array {
         $pdo = db();
         $pdo->beginTransaction();
@@ -156,7 +150,7 @@ class Order {
         $stmt->execute(['FAILED', $paymentTxId, db_now(), $id]);
     }
 
-    /** Marca enviado + guarda guía y transportadora. */
+    
     public static function markShipped(string $id, ?string $carrier, ?string $tracking): void {
         $stmt = db()->prepare('UPDATE orders SET
             status = ?, tracking_carrier = ?, tracking_number = ?,
@@ -184,12 +178,7 @@ class Order {
         $stmt->execute([$notes, db_now(), $id]);
     }
 
-    /**
-     * Listado paginable con filtros para el admin.
-     *
-     * @param array $opts ['status'?, 'q'?, 'page'?, 'perPage'?]
-     * @return array{items:array, total:int, page:int, pages:int, perPage:int}
-     */
+    
     public static function search(array $opts = []): array {
         $where = ['1=1'];
         $args  = [];
@@ -203,7 +192,7 @@ class Order {
 
         $q = trim((string)($opts['q'] ?? ''));
         if ($q !== '') {
-            // Buscar por número, email, teléfono o nombre
+            
             $where[] = '(order_number LIKE ? OR customer_email LIKE ? OR customer_phone LIKE ? OR customer_name LIKE ?)';
             $like = '%' . $q . '%';
             $args[] = $like; $args[] = $like; $args[] = $like; $args[] = $like;

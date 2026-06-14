@@ -53,7 +53,7 @@ class Category {
     }
 
     public static function delete(string $id): bool {
-        // No borrar si tiene productos
+        
         $cnt = db()->prepare('SELECT COUNT(*) FROM products WHERE category_id = ?');
         $cnt->execute([$id]);
         if ((int)$cnt->fetchColumn() > 0) return false;

@@ -2,24 +2,15 @@
 declare(strict_types=1);
 
 class Webhook {
-    /**
-     * POST /api/wompi/webhook
-     *
-     * Wompi nos avisa cuando una transacción cambia de estado. Validamos:
-     *   1. La firma del evento contra WOMPI_EVENTS_SECRET
-     *   2. (Defensivo) Re-consultamos la transacción contra Wompi con el
-     *      private key para no confiar ciegamente en el payload
-     *   3. Encontramos la orden por reference
-     *   4. Aplicamos el cambio (PAID / FAILED) de forma idempotente
-     */
+    
     public static function wompi(): void {
         if (!Wompi::isWebhookReady()) {
             self::respond(['ok' => false, 'reason' => 'not configured'], 503);
         }
 
         $raw = file_get_contents('php://input') ?: '';
-        // Tope defensivo: un webhook legítimo de Wompi pesa < 4KB. Cualquier
-        // cosa más grande es sospechosa (intento de DoS o payload malicioso).
+        
+        
         if (strlen($raw) > 64_000) {
             error_log('Wompi webhook: payload too large (' . strlen($raw) . ' bytes)');
             self::respond(['ok' => false, 'reason' => 'payload too large'], 413);
@@ -36,11 +27,11 @@ class Webhook {
 
         $tx = $event['data']['transaction'] ?? null;
         if (!is_array($tx)) {
-            // Evento que no es de transacción → respondemos 200 para que Wompi no reintente
+            
             self::respond(['ok' => true, 'ignored' => true]);
         }
 
-        // Sanea los IDs antes de usar: Wompi tx IDs son alfanuméricos + guiones.
+        
         $txIdRaw   = (string)($tx['id']        ?? '');
         $refRaw    = (string)($tx['reference'] ?? '');
         $txId      = preg_replace('/[^A-Za-z0-9\-]/', '', $txIdRaw) ?? '';
@@ -51,8 +42,8 @@ class Webhook {
             self::respond(['ok' => false, 'reason' => 'missing tx fields'], 400);
         }
 
-        // Defensa: re-consultamos el estado contra Wompi en lugar de confiar
-        // ciegamente en el payload del evento.
+        
+        
         $confirmed = Wompi::getTransaction($txId);
         if (!$confirmed) {
             error_log("Wompi webhook: lookup failed for tx $txId");

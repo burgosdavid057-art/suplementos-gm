@@ -10,7 +10,6 @@ echo "  (el resto de productos viene de Alegra: corre 'php scripts/sync-alegra.p
 
 $pdo->beginTransaction();
 
-// ─── Admin ───────────────────────────────────────────
 $adminEmail = env('ADMIN_EMAIL', 'suplementosgm2@gmail.com');
 $adminPass  = env('ADMIN_PASSWORD', 'ChangeMe123!');
 
@@ -18,7 +17,6 @@ $pdo->prepare('INSERT OR REPLACE INTO users (id, email, password, name, role) VA
     ->execute([db_id(), $adminEmail, password_hash($adminPass, PASSWORD_BCRYPT), 'Admin', 'ADMIN']);
 echo "  · Admin: $adminEmail\n";
 
-// ─── Categoría "Marca propia" para alojar el flagship ───
 $catId = null;
 $stmt  = $pdo->prepare('SELECT id FROM categories WHERE slug = ? LIMIT 1');
 $stmt->execute(['marca-propia']);
@@ -32,7 +30,6 @@ if ($row) {
     echo "  · Categoría: Marca propia\n";
 }
 
-// ─── Body Builder 5000 (flagship — sin alegra_id, gestión manual) ───
 $stmt = $pdo->prepare('SELECT id FROM products WHERE slug = ? LIMIT 1');
 $stmt->execute(['body-builder-5000']);
 if (!$stmt->fetch()) {

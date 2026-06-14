@@ -8,7 +8,6 @@
 *.secret
 
 # Editor config
-.claude/
 *.md.bak
 
 # PHP

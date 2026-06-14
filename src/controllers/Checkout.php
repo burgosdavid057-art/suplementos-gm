@@ -2,9 +2,7 @@
 declare(strict_types=1);
 
 class Checkout {
-    /**
-     * GET /checkout — formulario de envío.
-     */
+    
     public static function index(): void {
         render_layout('checkout/index', [
             'title'        => 'Checkout — Suplementos GM',
@@ -15,16 +13,13 @@ class Checkout {
         ]);
     }
 
-    /**
-     * POST /checkout — crea la orden y redirige a la página de pago.
-     * Todos los inputs pasan por Input::* (sanitización + tipado tipo-seguro).
-     */
+    
     public static function create(): void {
         csrf_check();
 
         $errors = [];
 
-        // ─── Datos del comprador (facturación electrónica) ────────
+        
         $customerType = Input::enum('customer_type', ['natural', 'juridica'], 'natural');
         $rawDocType   = strtoupper((string) Input::text('customer_doc_type', 8) ?? '');
         $allowedDocTypes = $customerType === 'juridica' ? ['NIT'] : ['CC', 'CE', 'PP', 'TI'];
@@ -40,12 +35,12 @@ class Checkout {
         $methodId  = Input::text('shipping_method', 32)           ?? '';
         $itemsJson = $_POST['items'] ?? '';
 
-        // ─── Dirección de facturación ───────────────────────
+        
         $billingAddress = Input::text('billing_address', 200) ?? '';
         $billingCity    = Input::text('billing_city', 80)     ?? '';
         $billingState   = Input::text('billing_state', 80)    ?? '';
 
-        // ─── Validaciones de longitud y formato ─────────────
+        
         if (mb_strlen($name) < 3) {
             $errors['customer_name'] = $customerType === 'juridica'
                 ? 'Ingresa la razón social.'
@@ -67,28 +62,28 @@ class Checkout {
         if ($billingCity === '')            $errors['billing_city']    = 'Ciudad de facturación es obligatoria.';
         if ($billingState === '')           $errors['billing_state']   = 'Departamento de facturación es obligatorio.';
 
-        // Consentimiento legal (Términos + Privacidad + Devoluciones)
+        
         if (!Input::bool('terms_accepted')) {
             $errors['terms_accepted'] = 'Debes aceptar los Términos, Privacidad y Devoluciones para continuar.';
         }
 
-        // ─── Validar método ─────────────────────────────────
+        
         $method = Shipping::methodById($methodId);
         if (!$method) {
             $errors['shipping_method'] = 'Selecciona un método de envío.';
         }
 
-        // ─── ¿Usa la misma dirección que facturación? ───────
+        
         $shipSameAsBilling = Input::bool('shipping_same_as_billing');
 
-        // ─── Campos de envío según el método ────────────────
+        
         $address = '';
         $city    = '';
         $state   = '';
         $terminal = null;
 
         if ($method && $method['requires_terminal']) {
-            // BUS — terminal del Norte o del Sur (enum)
+            
             $terminal = Input::enum('shipping_terminal', array_keys(Shipping::terminals() ?: []));
             $terminalLabel = $terminal ? Shipping::terminalLabel($terminal) : null;
             if (!$terminalLabel) {
@@ -118,7 +113,7 @@ class Checkout {
             }
         }
 
-        // ─── Items del carrito (JSON validado) ──────────────
+        
         if (!is_string($itemsJson) || strlen($itemsJson) > 100_000) {
             $errors['items'] = 'Carrito inválido.';
             $rawItems = [];
@@ -166,21 +161,21 @@ class Checkout {
             return;
         }
 
-        // ─── Validar y resolver productos del carrito ───────
-        // El precio y el nombre vienen del lado servidor (no del JSON del
-        // carrito) para evitar manipulación. Solo aceptamos id + qty del cliente.
+        
+        
+        
         $items = [];
         $subtotal = 0;
-        $maxItems = 50; // sanity cap
+        $maxItems = 50; 
         foreach (array_slice($rawItems, 0, $maxItems) as $row) {
             if (!is_array($row)) continue;
             $rawId  = $row['id']  ?? '';
             $rawQty = $row['qty'] ?? 1;
-            // Sanea id: solo alfanuméricos + guiones, máx 40 chars
+            
             $pid = is_string($rawId) ? preg_replace('/[^a-zA-Z0-9\-]/', '', $rawId) : '';
             $pid = mb_substr((string) $pid, 0, 40);
             if ($pid === '') continue;
-            // Sanea qty: entero entre 1 y 999
+            
             $qty = is_numeric($rawQty) ? (int) $rawQty : 1;
             $qty = max(1, min(999, $qty));
 
@@ -209,18 +204,18 @@ class Checkout {
             return;
         }
 
-        // ─── Calcular envío y total ─────────────────────────
+        
         $shippingCost = Shipping::quote($methodId);
         $total = $subtotal + $shippingCost;
 
-        // ─── Persistir ──────────────────────────────────────
-        // En este punto todos los valores ya fueron saneados arriba via Input::*
+        
+        
         $created = Order::create([
             'customer_type'     => $customerType,
             'customer_doc_type' => $docType,
             'customer_doc_id'   => $docDigits,
             'customer_name'     => $name,
-            'customer_email'    => $email,        // Input::email() ya lo lowerea
+            'customer_email'    => $email,        
             'customer_phone'    => $phone,
             'billing_name'      => $name,
             'billing_address'   => $billingAddress,
@@ -231,14 +226,14 @@ class Checkout {
             'shipping_address'  => $address,
             'shipping_city'     => $city,
             'shipping_state'    => $state,
-            'shipping_notes'    => $notes,        // textArea() retorna null si está vacío
+            'shipping_notes'    => $notes,        
             'subtotal'          => $subtotal,
             'shipping_cost'     => $shippingCost,
             'total'             => $total,
         ], $items);
 
-        // Email al cliente con la orden pendiente de pago. Lanza-y-olvida —
-        // si Resend falla, no rompemos el checkout.
+        
+        
         try {
             $fullOrder = Order::findByNumber($created['order_number']);
             if ($fullOrder) {
@@ -252,13 +247,9 @@ class Checkout {
         redirect('/checkout/orden/' . $created['order_number']);
     }
 
-    /**
-     * GET /orden — formulario para que el cliente entre el número y email
-     * de su pedido. Si pasan ?numero=&email= por query, intenta lookup
-     * directo (útil para shareable URLs desde el correo).
-     */
+    
     public static function track(): void {
-        // Sanitizamos: el número solo acepta [A-Z0-9-], el email se valida.
+        
         $rawNumero = Input::text('numero', 40, $_GET);
         $numero    = $rawNumero ? strtoupper(preg_replace('/[^A-Za-z0-9\-]/', '', $rawNumero) ?? '') : '';
         $email     = Input::email('email', $_GET) ?? '';
@@ -284,9 +275,7 @@ class Checkout {
         ]);
     }
 
-    /**
-     * POST /orden — recibe número + email, valida y redirige.
-     */
+    
     public static function trackLookup(): void {
         csrf_check();
         $rawNumero = Input::text('numero', 40);
@@ -314,10 +303,7 @@ class Checkout {
         ]);
     }
 
-    /**
-     * Busca un pedido validando que el email coincida (anti-enumeración).
-     * Devuelve el row o null.
-     */
+    
     private static function lookupOrder(string $numero, string $email): ?array {
         $order = Order::findByNumber(strtoupper($numero));
         if (!$order) return null;
@@ -325,23 +311,15 @@ class Checkout {
         return $order;
     }
 
-    /**
-     * GET /checkout/orden/{numero} — confirmación + opciones de pago.
-     * Si Wompi está totalmente configurado, muestra el botón. Si no,
-     * muestra fallback a WhatsApp.
-     *
-     * Si Wompi nos redirige acá con ?id={transactionId} después del pago,
-     * sincronizamos contra el API de Wompi por si el webhook todavía no
-     * llegó — así el cliente ve el estado correcto de inmediato.
-     */
+    
     public static function orden(string $orderNumber): void {
         $order = Order::findByNumber($orderNumber);
         if (!$order) {
             not_found('Pedido no encontrado.');
         }
 
-        // Sync defensivo si venimos de un redirect de Wompi (?id=...)
-        // Wompi tx IDs son tipo "01-1234567890-12345" — alfanuméricos + guiones.
+        
+        
         $txIdRaw    = Input::text('id', 64, $_GET);
         $txIdFromUrl = $txIdRaw ? preg_replace('/[^A-Za-z0-9\-]/', '', $txIdRaw) : null;
         if (
@@ -353,7 +331,7 @@ class Checkout {
                 $tx = Wompi::getTransaction($txIdFromUrl);
                 if ($tx && (string)($tx['reference'] ?? '') === $orderNumber) {
                     if (Wompi::applyTransactionToOrder($order, $tx)) {
-                        $order = Order::findByNumber($orderNumber); // refrescar
+                        $order = Order::findByNumber($orderNumber); 
                     }
                 }
             } catch (Throwable $e) {

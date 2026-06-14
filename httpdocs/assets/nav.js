@@ -1,9 +1,6 @@
-/*
- * Navbar interactions: dropdown categorías, mobile menu, búsqueda mobile,
- * scroll state. Sin dependencias.
- */
+
 (function () {
-  // ─── Dropdown (Categorías en desktop) ─────────────────
+  
   function setupDropdowns() {
     document.querySelectorAll('[data-dropdown]').forEach((wrapper) => {
       const name = wrapper.dataset.dropdown;
@@ -23,7 +20,7 @@
         } else {
           panel.dataset.open = 'false';
           if (chevron) chevron.style.transform = '';
-          // Esperar al final de la transición CSS para ocultar
+          
           setTimeout(() => {
             if (!open) panel.classList.add('hidden');
           }, 180);
@@ -34,13 +31,13 @@
         e.stopPropagation();
         setOpen(!open);
       });
-      // Cerrar al hacer click fuera
+      
       document.addEventListener('click', (e) => {
         if (open && !panel.contains(e.target) && !wrapper.contains(e.target)) {
           setOpen(false);
         }
       });
-      // Cerrar con Escape
+      
       document.addEventListener('keydown', (e) => {
         if (open && e.key === 'Escape') {
           setOpen(false);
@@ -50,7 +47,7 @@
     });
   }
 
-  // ─── Mobile menu (slide-in panel) ─────────────────────
+  
   function setupMobileMenu() {
     const menu = document.querySelector('[data-mobile-menu]');
     if (!menu) return;
@@ -89,7 +86,7 @@
     });
   }
 
-  // ─── Búsqueda mobile (toggle panel) ───────────────────
+  
   function setupMobileSearch() {
     const toggle = document.querySelector('[data-mobile-search-toggle]');
     const panel = document.querySelector('[data-mobile-search]');
@@ -106,7 +103,7 @@
     });
   }
 
-  // ─── Header sticky scroll state ──────────────────────
+  
   function setupHeaderScroll() {
     const header = document.querySelector('[data-header]');
     if (!header) return;
@@ -124,7 +121,7 @@
     update();
   }
 
-  // ─── Cart bump animation cuando se agrega un item ────
+  
   function setupCartBump() {
     const btn = document.getElementById('cart-button');
     if (!btn) return;

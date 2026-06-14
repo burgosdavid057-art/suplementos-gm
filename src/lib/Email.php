@@ -1,21 +1,6 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Cliente Resend para enviar emails transaccionales.
- *
- * Docs: https://resend.com/docs/api-reference/emails/send-email
- *
- * Configuración (.env):
- *   RESEND_API_KEY  — la API key
- *   EMAIL_FROM      — "Nombre <email@dominio>" (debe estar verificado en Resend
- *                     en producción; el default `onboarding@resend.dev` solo
- *                     puede mandar emails al dueño de la cuenta)
- *   ADMIN_EMAIL     — destino de las notificaciones a la dueña
- *
- * Estrategia: nunca rompe el flujo principal. Si Resend falla, log de error
- * y devuelve false. Quien llama decide si reintentar o ignorar.
- */
 class Email {
     public static function isConfigured(): bool {
         return !empty(env('RESEND_API_KEY'));
@@ -29,16 +14,7 @@ class Email {
         return env('ADMIN_EMAIL') ?: null;
     }
 
-    /**
-     * Envía un email vía Resend y registra el intento en `email_log`.
-     *
-     * @param string|array $to        email destino o array de emails
-     * @param string       $subject   asunto
-     * @param string       $html      cuerpo HTML
-     * @param ?string      $text      cuerpo plano (opcional, generado del HTML si null)
-     * @param ?string      $replyTo   reply-to (opcional)
-     * @param array        $meta      ['kind' => 'order-paid-customer', 'ref_id' => $orderId, 'ref_type' => 'order']
-     */
+    
     public static function send(
         string|array $to,
         string $subject,
@@ -53,7 +29,7 @@ class Email {
         $refId   = (string)($meta['ref_id']   ?? '');
         $refType = (string)($meta['ref_type'] ?? '');
 
-        // Crear el row de log en 'pending' antes de intentar
+        
         $logId = self::logInsert($kind, $toStr, $fromAddr, $subject, $refId, $refType);
 
         if (!self::isConfigured()) {
@@ -106,7 +82,7 @@ class Email {
         return $providerId;
     }
 
-    // ─── Email log (audit trail) ─────────────────────────
+    
 
     private static function logInsert(string $kind, string $to, string $from, string $subject, string $refId, string $refType): string {
         try {
@@ -134,7 +110,7 @@ class Email {
         }
     }
 
-    /** Últimos N registros del log para el admin. */
+    
     public static function recentLogs(int $limit = 50): array {
         try {
             $stmt = db()->prepare('SELECT * FROM email_log ORDER BY created_at DESC LIMIT ?');
@@ -146,7 +122,7 @@ class Email {
         }
     }
 
-    /** Logs filtrados por order_id (cualquier email asociado a esa orden). */
+    
     public static function logsForOrder(string $orderId): array {
         try {
             $stmt = db()->prepare('SELECT * FROM email_log
@@ -159,7 +135,7 @@ class Email {
         }
     }
 
-    /** Renderiza un template phtml de src/views/emails y devuelve el HTML. */
+    
     public static function render(string $template, array $vars = []): string {
         $path = __DIR__ . '/../views/emails/' . $template . '.phtml';
         if (!is_file($path)) {
@@ -171,7 +147,7 @@ class Email {
         return (string) ob_get_clean();
     }
 
-    /** Convierte HTML a texto plano básico para el alt text de los emails. */
+    
     private static function htmlToText(string $html): string {
         $t = preg_replace('#<br\s*/?>#i', "\n", $html) ?? $html;
         $t = preg_replace('#</(p|div|li|h[1-6]|tr)>#i', "\n", $t) ?? $t;

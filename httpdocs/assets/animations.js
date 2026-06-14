@@ -1,21 +1,7 @@
-/*
- * Animaciones GSAP — sutiles, performantes, una sola vez al entrar al viewport.
- *
- * Convenciones de markup:
- *   data-anim="fade-up"       → fade in + slight translateY
- *   data-anim="fade-in"       → solo opacity
- *   data-anim="scale-in"      → ligero scale + opacity
- *   data-anim="stagger"       → cada hijo directo aparece escalonado
- *   data-anim-delay="200"     → delay opcional en ms (encadena con el de defecto)
- *
- * El <html> recibe la clase `js-anim` desde un script inline en <head> ANTES
- * de que pinte la página, para que site.css oculte instantáneamente los
- * elementos animados y no haya parpadeo. Si JS o GSAP fallan, no se aplica
- * la clase y los elementos quedan visibles (degradación natural).
- */
+
 (function () {
   if (!window.gsap) {
-    // GSAP no cargó — quitar la clase para que los elementos se vean.
+    
     document.documentElement.classList.remove("js-anim");
     return;
   }
@@ -98,7 +84,7 @@
     });
   }
 
-  // ─── Hero: animación inmediata, sin esperar scroll ───
+  
   function heroEntry() {
     const heroNodes = document.querySelectorAll('[data-anim-hero]');
     if (!heroNodes.length) return;
@@ -113,7 +99,7 @@
     });
   }
 
-  // ─── Header sticky: oscurecer fondo al hacer scroll ──
+  
   function headerOnScroll() {
     const header = document.querySelector("[data-header]");
     if (!header) return;
@@ -124,7 +110,7 @@
     window.addEventListener("scroll", update, { passive: true });
   }
 
-  // ─── Caballo galopando: cruza la banda con el scroll ──
+  
   function gallopingHorse() {
     const band = document.querySelector("[data-galloping-band]");
     if (!band) return;
@@ -137,11 +123,11 @@
       raf = 0;
       const rect = band.getBoundingClientRect();
       const vh = window.innerHeight;
-      // 0 cuando la banda entra por abajo, 1 cuando sale por arriba.
+      
       const total = vh + rect.height;
       const seen = vh - rect.top;
       const pct = Math.max(0, Math.min(1, seen / total));
-      // Va de -20% (off-screen izq) a 115% (off-screen der).
+      
       const left = -20 + pct * 135;
       horse.style.left = left + "%";
       if (trail) trail.style.left = Math.max(-30, left - 25) + "%";

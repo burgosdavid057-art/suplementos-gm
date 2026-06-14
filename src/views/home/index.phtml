@@ -29,20 +29,19 @@ $TRUST_BADGES = [
 ];
 ?>
 
-<!-- ─── HERO con foto ecuestre + logo en silla ──────── -->
 <section class="hero-section relative overflow-hidden text-white">
 
-  <!-- Foto: caballos en pradera + silla con logo GM -->
+  
   <div aria-hidden="true" class="hero-photo"></div>
 
-  <!-- Overlay degradado para legibilidad del texto -->
+  
   <div aria-hidden="true" class="hero-overlay"></div>
 
-  <!-- Fade inferior para conectar con la galloping band (que empieza con #2a1410) -->
+  
   <div aria-hidden="true" class="absolute inset-x-0 bottom-0 h-24 md:h-32 pointer-events-none z-[3]"
        style="background:linear-gradient(180deg, transparent 0%, rgba(42,20,16,.75) 65%, #2a1410 100%);"></div>
 
-  <!-- Contenido -->
+  
   <div class="hero-content relative z-[4] mx-auto max-w-6xl px-5 sm:px-6">
     <div class="max-w-xl">
       <p data-anim-hero class="hero-eyebrow">
@@ -73,7 +72,6 @@ $TRUST_BADGES = [
 
 </section>
 
-<!-- ─── Banda decorativa: caballo galopando con scroll ─── -->
 <section aria-hidden="true" class="galloping-band" data-galloping-band>
   <div class="galloping-track"></div>
   <div class="galloping-track" style="bottom:2.65rem; opacity:.5"></div>
@@ -91,8 +89,7 @@ $TRUST_BADGES = [
 
   <div class="galloping-horse" data-galloping-horse style="left:-20%;">
     <div class="animate-hoof-bounce">
-      <!-- height inline (con var) para que ningún reset (Tailwind preflight) lo sobrescriba.
-           El --horse-h se define en .galloping-band con media query para desktop. -->
+      
       <img src="/assets/caballo-galopante.png" alt="" draggable="false"
            style="height:var(--horse-h,6rem); width:auto; max-width:none; display:block;
                   filter:drop-shadow(0 6px 12px rgba(0,0,0,.18));">
@@ -100,12 +97,11 @@ $TRUST_BADGES = [
   </div>
 </section>
 
-<!-- ─── Producto estrella: Body Builder 5000 ──────────── -->
 <?php if (!empty($flagship)): ?>
 <?php $flagImg = $flagship['images'][0] ?? '/assets/bodybuilder5000.jpg'; ?>
 <section class="relative overflow-hidden text-white"
          style="background:linear-gradient(135deg,#1a0405 0%, #2d3436 50%, #3d0a0e 100%);">
-  <!-- Glows decorativos -->
+  
   <div aria-hidden="true" class="pointer-events-none absolute -left-24 top-1/4 h-96 w-96 rounded-full"
        style="background:rgba(220,38,38,.30); filter:blur(80px);"></div>
   <div aria-hidden="true" class="pointer-events-none absolute -right-32 bottom-0 h-[28rem] w-[28rem] rounded-full"
@@ -173,7 +169,6 @@ $TRUST_BADGES = [
 </section>
 <?php endif; ?>
 
-<!-- ─── Banner verde "Rastrear pedido" ──────────────── -->
 <section class="text-white" style="background:linear-gradient(to right,#28b22e,#1d8e23,#28b22e);">
   <div class="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4 px-4 sm:px-6 py-6">
     <div class="flex items-center gap-3">
@@ -193,7 +188,6 @@ $TRUST_BADGES = [
   </div>
 </section>
 
-<!-- ─── Trust badges (stagger) ──────────────────────── -->
 <section class="bg-white">
   <div data-anim="stagger" class="mx-auto grid grid-cols-1 max-w-6xl gap-6 px-4 sm:px-6 py-12 sm:grid-cols-2 lg:grid-cols-4">
     <?php foreach ($TRUST_BADGES as $b): ?>
@@ -208,7 +202,6 @@ $TRUST_BADGES = [
   </div>
 </section>
 
-<!-- ─── Categorías ──────────────────────────────────── -->
 <section class="bg-silver">
   <div class="mx-auto w-full max-w-6xl px-4 sm:px-6 py-20">
     <div data-anim="fade-up" class="flex flex-wrap items-end justify-between gap-4">
@@ -247,7 +240,6 @@ $TRUST_BADGES = [
   </div>
 </section>
 
-<!-- ─── Productos destacados ────────────────────────── -->
 <?php if (!empty($featured)): ?>
 <section class="bg-white">
   <div class="mx-auto w-full max-w-6xl px-4 sm:px-6 py-20">
@@ -300,7 +292,6 @@ $TRUST_BADGES = [
 </section>
 <?php endif; ?>
 
-<!-- ─── Banda parallax con foto de campo ────────────── -->
 <section class="relative h-72 md:h-96 overflow-hidden" style="background:linear-gradient(135deg,#1d8e23,#156c1a,#2d3436);">
   <img src="<?= e($FIELD_LANDSCAPE) ?>" alt="" loading="lazy" class="absolute inset-0 h-full w-full object-cover">
   <div aria-hidden="true" class="absolute inset-0"
@@ -316,7 +307,6 @@ $TRUST_BADGES = [
   </div>
 </section>
 
-<!-- ─── About ───────────────────────────────────────── -->
 <section class="bg-silver">
   <div class="mx-auto grid grid-cols-1 max-w-6xl gap-10 px-4 sm:px-6 py-20 md:grid-cols-2 md:items-center">
     <div data-anim="fade-up" class="order-2 md:order-1">

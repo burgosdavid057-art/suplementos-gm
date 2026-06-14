@@ -1,18 +1,6 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Páginas legales requeridas por la SIC para e-commerce en Colombia.
- *
- *   - Ley 1480 de 2011  — Estatuto del Consumidor
- *   - Ley 1581 de 2012  — Habeas Data / Protección de Datos Personales
- *   - Decreto 1377/2013 — Reglamentación Ley 1581
- *   - Circular Externa 002/2015 SIC — Comercio electrónico
- *
- * Una sola ruta `/legal/{slug}` con allowlist evita listar páginas inexistentes
- * o exponer rutas dinámicas. Los aliases tradicionales `/terminos`,
- * `/privacidad`, `/devoluciones`, `/cookies` redirigen acá.
- */
 class Legal {
     private const PAGES = [
         'terminos'     => [
@@ -54,13 +42,13 @@ class Legal {
         ]);
     }
 
-    // ─── Aliases (redirigen al canónico /legal/{slug}) ──
+    
     public static function aliasTerminos(): void     { redirect('/legal/terminos',     301); }
     public static function aliasPrivacidad(): void   { redirect('/legal/privacidad',   301); }
     public static function aliasDevoluciones(): void { redirect('/legal/devoluciones', 301); }
     public static function aliasCookies(): void      { redirect('/legal/cookies',      301); }
 
-    /** Datos del responsable del tratamiento (ajustar cuando la dueña los confirme). */
+    
     public static function legalEntity(): array {
         return [
             'name'       => 'Suplementos GM',

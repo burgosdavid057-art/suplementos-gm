@@ -1,17 +1,6 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Catálogo de métodos de envío de Suplementos GM (Rionegro, Antioquia).
- *
- *   1) interrapidisimo   PCE — pago contra entrega, $0 al checkout, lo cobra
- *                              el mensajero al recibir. 2-5 días hábiles.
- *   2) bus               $15.000 — encomienda en bus, el cliente recoge en
- *                              Terminal del Norte o Terminal del Sur de
- *                              Medellín. 1-2 días hábiles.
- *   3) oriente_cercano   $10.000 — entrega local en oriente antioqueño
- *                              (Rionegro y aledaños). Mismo día o siguiente.
- */
 class Shipping {
     private const METHODS = [
         [
@@ -63,7 +52,7 @@ class Shipping {
         'sur'   => 'Terminal del Sur (Medellín)',
     ];
 
-    /** @return array<int, array<string, mixed>> */
+    
     public static function methods(): array {
         return self::METHODS;
     }
@@ -79,13 +68,13 @@ class Shipping {
         return self::METHODS[0]['id'];
     }
 
-    /** Costo de envío para un método (0 si es PCE o método inválido). */
+    
     public static function quote(string $methodId): int {
         $m = self::methodById($methodId);
         return $m ? (int)$m['cost'] : 0;
     }
 
-    /** Min y máx para mostrar rango en el carrito. */
+    
     public static function minRate(): int {
         return min(array_column(self::METHODS, 'cost'));
     }
@@ -93,7 +82,7 @@ class Shipping {
         return max(array_column(self::METHODS, 'cost'));
     }
 
-    /** @return array<string, string>  ['norte' => 'Terminal del Norte (Medellín)', ...] */
+    
     public static function terminals(): array {
         return self::TERMINALS;
     }
@@ -102,10 +91,7 @@ class Shipping {
         return self::TERMINALS[$key] ?? null;
     }
 
-    /**
-     * Devuelve un texto legible con la fecha estimada de entrega.
-     * Ej: "Entre el lunes 11 y el viernes 15 de mayo"
-     */
+    
     public static function etaText(string $methodId, ?string $orderDate = null): ?string {
         $m = self::methodById($methodId);
         if (!$m) return null;
@@ -113,7 +99,7 @@ class Shipping {
         $end   = self::addBusinessDays($orderDate, (int)$m['eta_max_days']);
 
         $fmt = static function (DateTimeImmutable $d): string {
-            // Días en español
+            
             $dias = ['Sunday'=>'domingo','Monday'=>'lunes','Tuesday'=>'martes',
                      'Wednesday'=>'miércoles','Thursday'=>'jueves','Friday'=>'viernes','Saturday'=>'sábado'];
             $meses = ['January'=>'enero','February'=>'febrero','March'=>'marzo','April'=>'abril',
@@ -130,10 +116,7 @@ class Shipping {
         return 'Entrega estimada: entre el ' . $fmt($start) . ' y el ' . $fmt($end);
     }
 
-    /**
-     * Suma N días hábiles a una fecha (saltando sábados y domingos).
-     * Si N=0, devuelve el mismo día.
-     */
+    
     private static function addBusinessDays(?string $from, int $days): DateTimeImmutable {
         $start = $from
             ? new DateTimeImmutable($from, new DateTimeZone('America/Bogota'))
@@ -144,8 +127,8 @@ class Shipping {
         $added = 0;
         while ($added < $days) {
             $current = $current->modify('+1 day');
-            $dow = (int)$current->format('N'); // 1 = lunes, 7 = domingo
-            if ($dow >= 6) continue;            // saltar sábado/domingo
+            $dow = (int)$current->format('N'); 
+            if ($dow >= 6) continue;            
             $added++;
         }
         return $current;

@@ -1,10 +1,7 @@
-/* Custom CSS específico de Suplementos GM.
-   Tokens y utilidades base están en tailwind.css. */
+
 
 html { scroll-behavior: smooth; }
 
-/* ─── Legal pages typography ────────────────────────────
-   Documento de texto largo, fácil de leer. */
 .legal-prose { color: #2d3436; font-size: 15px; line-height: 1.65; }
 .legal-prose h2 {
   margin-top: 2rem; margin-bottom: 0.5rem;
@@ -42,12 +39,6 @@ html { scroll-behavior: smooth; }
   color: #78350f;
 }
 
-/* ─── Brand logo sizing ─────────────────────────────────
-   Tamaños explícitos en CSS para no depender de las variants responsive
-   de Tailwind (sm: / lg:) que NO siempre están en el bundle compilado.
-   Usamos `width: auto` con `max-height` para que el logo (cualquier ratio)
-   nunca crezca más de lo querido en altura, y limitamos max-width para
-   que un logo extremadamente horizontal no empuje la nav fuera del header. */
 .brand-logo-nav {
   height: 40px;
   width: auto;
@@ -90,25 +81,15 @@ html { scroll-behavior: smooth; }
   object-fit: contain;
 }
 
-/* ─── Reglas defensivas para responsive en móvil ──────
-   Previene los bugs más comunes que rompen el layout en pantallas chicas.
-   Todo esto es seguro: solo aplica si el desarrollador olvidó algo. */
-
-/* 1. Nada genera scroll horizontal por accidente. overflow-x: hidden tiene
-      mejor soporte que clip en iOS Safari viejos. Solo en <body>, no en
-      <html>, para preservar position: sticky en headers. */
 body { overflow-x: hidden; min-width: 0; }
 
-/* 2. Imágenes y multimedia siempre responsive por default. */
 img, video, iframe, svg {
   max-width: 100%;
   height: auto;
 }
-/* Excepción: los SVG decorativos del header/UI deben respetar sus tamaños */
+
 header svg, button svg, a svg { height: revert; max-width: revert; }
 
-/* 3. Cualquier elemento marcado con .container o data-container es full-width
-      con padding lateral seguro en móvil. */
 [data-container],
 .container-page {
   width: 100%;
@@ -123,27 +104,15 @@ header svg, button svg, a svg { height: revert; max-width: revert; }
   .container-page { padding-left: 1.5rem; padding-right: 1.5rem; }
 }
 
-/* Aspect ratio fallback */
 .aspect-square { aspect-ratio: 1 / 1; }
 
-/* Cart count badge oculto cuando 0 */
 #cart-count.opacity-0 { opacity: 0; transform: scale(.5); transition: all .2s; }
 
-/* Cart button transition */
 #cart-button { transition: background-color .2s, transform .18s ease-out; }
 
-/* Quitar marker en details */
 details > summary { list-style: none; }
 details > summary::-webkit-details-marker { display: none; }
 
-/* ─── Catálogo: layout responsive sin depender de Tailwind ─
-   Mobile (<1024px): flex column, todo apilado al 100% de ancho.
-   Desktop (≥1024px): grid 260px + 1fr — sidebar izquierda, productos a la derecha.
-
-   IMPORTANTE: definido en CSS custom porque Tailwind solo compila las clases
-   que ya usaste en algún template. Si añades `lg:flex-row` nuevo, NO se
-   genera (a menos que recompiles Tailwind). Aquí garantizamos que funcione
-   sin recompilación. */
 .catalog-layout {
   display: flex;
   flex-direction: column;
@@ -185,10 +154,6 @@ details > summary::-webkit-details-marker { display: none; }
   min-width: 0;
 }
 
-/* ─── Carrito: layout responsive sin Tailwind ──────────
-   Móvil: stack. Desktop: items izq (1fr) + resumen der (360px).
-   `:not(.hidden)` para que la clase Tailwind `hidden` (display:none, usada
-   antes de que JS detecte items en el carrito) tenga prioridad. */
 .cart-layout:not(.hidden) {
   display: flex;
   flex-direction: column;
@@ -215,21 +180,16 @@ details > summary::-webkit-details-marker { display: none; }
   }
 }
 
-/* ─── Filter sidebar panel ─────────────────────────────
-   Móvil: oculto por defecto, visible cuando data-open="true".
-   Desktop (lg+, >=1024px): siempre visible — el botón toggle se oculta. */
 .filter-panel { display: none; }
 .filter-panel[data-open="true"] { display: block; }
 @media (min-width: 1024px) {
   .filter-panel { display: block !important; }
 }
 
-/* xs breakpoint helper para el logo brand text (no existe en tailwind por defecto) */
 @media (min-width: 480px) {
   .xs\:inline { display: inline; }
 }
 
-/* ─── Navbar ─────────────────────────────────────────── */
 .navlink {
   display: inline-flex;
   align-items: center;
@@ -272,7 +232,6 @@ details > summary::-webkit-details-marker { display: none; }
   font-size: 1.1rem;
 }
 
-/* ─── Dropdown panel animation ───────────────────────── */
 [data-dropdown-panel] {
   opacity: 0;
   transform: translateY(-6px);
@@ -283,7 +242,6 @@ details > summary::-webkit-details-marker { display: none; }
   transform: translateY(0);
 }
 
-/* ─── Mobile menu transitions ────────────────────────── */
 [data-mobile-menu] [data-overlay] {
   opacity: 0;
   transition: opacity .25s ease-out;
@@ -292,14 +250,12 @@ details > summary::-webkit-details-marker { display: none; }
   transition: transform .25s cubic-bezier(.16,1,.3,1);
 }
 
-/* ─── Anti-flash GSAP ────────────────────────────────── */
 .js-anim [data-anim="fade-up"],
 .js-anim [data-anim="fade-in"],
 .js-anim [data-anim="scale-in"],
 .js-anim [data-anim-hero] { opacity: 0; will-change: transform, opacity; }
 .js-anim [data-anim="stagger"] > * { opacity: 0; will-change: transform, opacity; }
 
-/* ─── Header sticky scroll state ─────────────────────── */
 [data-header] {
   transition: box-shadow .2s ease, border-color .2s ease;
 }
@@ -307,34 +263,17 @@ details > summary::-webkit-details-marker { display: none; }
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
 
-/* GPU compose hint para imágenes grandes */
 [data-anim-hero] img,
 [data-anim="scale-in"] img { transform: translateZ(0); }
 
-/* ─── Product card ─────────────────────────────────────
-   ESTRATEGIA RESPONSIVE EN 2 LAYOUTS DISTINTOS:
-
-   1) Móvil (<640px, 1 columna):
-      Tarjeta HORIZONTAL — imagen pequeña fija a la izquierda (110×110px),
-      info a la derecha (título, marca, precio, botón). Patrón "list view"
-      como Mercado Libre/Amazon mobile. Garantiza imagen razonable.
-
-   2) sm+ (>=640px, 2/3/4 columnas):
-      Tarjeta VERTICAL — imagen arriba (1:1), info abajo. Patrón clásico
-      de catálogo en grid.
-
-   min-width:0 sobre el card: clave para que en grids 2+ cols los items
-   se puedan achicar bajo su contenido más ancho (precios largos). */
-
 .product-card {
   min-width: 0;
-  flex-direction: row;          /* móvil: horizontal */
+  flex-direction: row;          
 }
 @media (min-width: 640px) {
   .product-card { flex-direction: column; }
 }
 
-/* Marco de la imagen + fondo decorativo. */
 .product-card-img-link {
   position: relative;
   flex-shrink: 0;
@@ -345,7 +284,7 @@ details > summary::-webkit-details-marker { display: none; }
   align-items: center;
   justify-content: center;
 
-  /* Móvil: ancho FIJO 120px a la izquierda */
+  
   width: 120px;
   aspect-ratio: 1 / 1;
   border-right: 1px solid #ececec;
@@ -353,7 +292,7 @@ details > summary::-webkit-details-marker { display: none; }
 }
 @media (min-width: 640px) {
   .product-card-img-link {
-    /* sm+: ocupa todo el ancho de la card, encima */
+    
     width: 100%;
     aspect-ratio: 1 / 1;
     border-right: none;
@@ -375,8 +314,7 @@ details > summary::-webkit-details-marker { display: none; }
   z-index: 1;
   display: block;
   margin: 0 auto;
-  /* La imagen escala dentro del marco sin estirarse, con padding visual.
-     85% / 85% deja un "aire" alrededor que respira el halo verde. */
+  
   max-width: 85%;
   max-height: 85%;
   width: auto;
@@ -396,10 +334,6 @@ details > summary::-webkit-details-marker { display: none; }
   .product-card-empty { font-size: 3rem; }
 }
 
-/* ─── Producto agotado ──────────────────────────────────
-   Estilo visual claro para que el cliente vea de un vistazo qué está sin
-   stock: imagen desaturada + overlay translúcido + sello rojo "Agotado"
-   en diagonal sobre la foto. */
 .product-card.is-out-of-stock {
   opacity: 0.85;
 }
@@ -407,7 +341,7 @@ details > summary::-webkit-details-marker { display: none; }
   filter: grayscale(0.85) brightness(1.05);
 }
 .product-card.is-out-of-stock .product-card-img-link::after {
-  /* veladura blanca semitransparente encima del producto */
+  
   content: "";
   position: absolute;
   inset: 0;
@@ -416,7 +350,6 @@ details > summary::-webkit-details-marker { display: none; }
   z-index: 2;
 }
 
-/* Sello "AGOTADO" — banner rojo en diagonal sobre la foto */
 .product-card-stamp {
   position: absolute;
   top: 12px;
@@ -443,11 +376,6 @@ details > summary::-webkit-details-marker { display: none; }
   }
 }
 
-/* ─── Product detail image (show.phtml) ─────────────
-   Mismo principio que las cards pero a mayor tamaño: contenedor cuadrado
-   con bg suave y producto centrado en object-contain con padding. La
-   imagen NUNCA escala más allá de su tamaño nativo (con cld_image()
-   pedimos c_limit a Cloudinary). */
 .product-detail-img-frame {
   background:
     radial-gradient(120% 80% at 50% 0%, #ffffff 0%, #f5f6f7 60%, #eceeee 100%);
@@ -477,9 +405,6 @@ details > summary::-webkit-details-marker { display: none; }
   .product-detail-img { padding: 40px; }
 }
 
-/* ─── Animaciones decorativas ────────────────────────── */
-
-/* Flecha que "galopa" en CTAs (un pequeño bamboleo lateral) */
 @keyframes gallop {
   0%, 100% { transform: translateX(0); }
   50%      { transform: translateX(6px); }
@@ -489,16 +414,12 @@ details > summary::-webkit-details-marker { display: none; }
   animation: gallop 1.6s ease-in-out infinite;
 }
 
-/* Rebote vertical del caballo en la banda decorativa */
 @keyframes hoof-bounce {
   0%, 100% { transform: translateY(0)    rotate(-1.5deg); }
   50%      { transform: translateY(-6px) rotate(1.5deg);  }
 }
 .animate-hoof-bounce { animation: hoof-bounce 0.6s ease-in-out infinite; }
 
-/* ════════════════════════════════════════════════════════════
-   HERO con foto ecuestre full-bleed + overlay degradado
-   ════════════════════════════════════════════════════════════ */
 .hero-section {
   position: relative;
   isolation: isolate;
@@ -506,8 +427,6 @@ details > summary::-webkit-details-marker { display: none; }
   background: #0f1213;
 }
 
-/* Foto cubre TODO el hero. Solo desplazo background-position para mover
-   horizontalmente qué parte de la imagen se ve. */
 .hero-photo {
   position: absolute;
   inset: 0;
@@ -518,25 +437,21 @@ details > summary::-webkit-details-marker { display: none; }
 }
 @media (min-width: 768px) {
   .hero-photo {
-    /* 58% = corremos la foto a la izquierda lo justo para que el bolso con el
-       logo GM entre completo (sin recorte por el borde derecho). */
+    
     background-position: 58% center;
   }
 }
 
-/* Overlay MÍNIMO — solo despinta cabecera y empalma galloping band abajo.
-   La zona donde vive el texto queda LIMPIA, sin negro encima.
-   Legibilidad del texto = text-shadow potente (más abajo). */
 .hero-overlay {
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
   background: linear-gradient(180deg,
-    rgba(0, 0, 0, 0.40) 0%,     /* leve oscurecido bajo el header */
+    rgba(0, 0, 0, 0.40) 0%,     
     rgba(0, 0, 0, 0)    18%,
     rgba(0, 0, 0, 0)    70%,
-    rgba(42, 20, 16, 0.85) 100% /* fade hacia la banda galopante */
+    rgba(42, 20, 16, 0.85) 100% 
   );
 }
 @media (min-width: 768px) {
@@ -550,11 +465,10 @@ details > summary::-webkit-details-marker { display: none; }
   }
 }
 
-/* Contenido (texto + botones) */
 .hero-content {
   padding-top: 5rem;
   padding-bottom: 4rem;
-  min-height: 32rem;       /* asegura altura mínima para que la foto se vea bien */
+  min-height: 32rem;       
   display: flex;
   align-items: center;
 }
@@ -580,8 +494,6 @@ details > summary::-webkit-details-marker { display: none; }
   }
 }
 
-/* Eyebrow con punto verde animado.
-   Pill con backdrop-blur fuerte para que se lea sobre cualquier zona de la foto. */
 .hero-eyebrow {
   display: inline-flex;
   align-items: center;
@@ -612,16 +524,13 @@ details > summary::-webkit-details-marker { display: none; }
   50%      { transform: scale(1.3); opacity: 0.6; }
 }
 
-/* Título con dos partes: marca (gradient text) + tagline (white sólido) */
 .hero-title {
   margin-top: 1rem;
   font-weight: 900;
   line-height: 1.02;
   letter-spacing: -0.025em;
 }
-/* Marca: gradient text. Como background-clip:text NO admite text-shadow
-   directamente sobre las letras gradientes, envolvemos el efecto con
-   filter: drop-shadow() (que sí respeta el alpha del texto recortado). */
+
 .hero-title-brand {
   display: block;
   font-size: clamp(2rem, 8vw, 4.2rem);
@@ -669,7 +578,6 @@ details > summary::-webkit-details-marker { display: none; }
   .hero-desc { font-size: 1.05rem; }
 }
 
-/* CTAs */
 .hero-cta {
   margin-top: 2rem;
   display: flex;
@@ -699,11 +607,7 @@ details > summary::-webkit-details-marker { display: none; }
     0 16px 40px -10px rgba(65, 210, 72, 0.9),
     0 6px 18px rgba(65, 210, 72, 0.45);
 }
-/* Liquid glass — efecto Apple/visionOS:
-   - Triple gradient para simular refracción
-   - backdrop-filter blur + saturate para que el color de la foto "pase" por el cristal
-   - Inset highlights arriba/abajo que dan grosor al cristal
-   - Sheen sutil con ::before */
+
 .hero-btn-ghost {
   position: relative;
   display: inline-flex;
@@ -732,7 +636,7 @@ details > summary::-webkit-details-marker { display: none; }
   overflow: hidden;
   transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
 }
-/* Sheen brillante en la mitad superior — efecto cristal pulido */
+
 .hero-btn-ghost::before {
   content: "";
   position: absolute;
@@ -745,7 +649,7 @@ details > summary::-webkit-details-marker { display: none; }
   );
   border-radius: inherit;
 }
-/* Reflejo lateral sutil que se mueve en hover */
+
 .hero-btn-ghost::after {
   content: "";
   position: absolute;
@@ -775,7 +679,6 @@ details > summary::-webkit-details-marker { display: none; }
 .hero-btn-ghost:hover::after { left: 130%; }
 .hero-btn-ghost > * { position: relative; z-index: 1; }
 
-/* Strip de stats */
 .hero-stats {
   margin-top: 2.5rem;
   display: grid;
@@ -822,26 +725,16 @@ details > summary::-webkit-details-marker { display: none; }
   .hero-stat-label { font-size: 0.72rem; }
 }
 
-/* En el hero ahora desactivamos el .js-anim opacity:0 para hero-eyebrow-dot
-   (que tiene su propia animación de pulse). El resto sí usa data-anim-hero. */
-
-/* ─── Banda del caballo galopando (entre secciones) ───── */
-/*
- * Conecta el hero (cálido, fotografía con tonos tierra/verde/dorado) con
- * el Body Builder (rojo-oscuro). Hace de transición usando un gradiente
- * que arranca en tonos cálidos oscuros tipo "tierra" y termina en
- * #1a0405 para empalmar exacto con el siguiente bloque.
- */
 .galloping-band {
   position: relative;
   height: 7rem;
   overflow: hidden;
   border: none;
   background: linear-gradient(180deg,
-    #2a1410 0%,        /* dark warm brown — cierre del hero */
+    #2a1410 0%,        
     #20100c 35%,
     #1a0a07 65%,
-    #1a0405 100%       /* match exacto con el Body Builder */
+    #1a0405 100%       
   );
   --horse-h: 5.5rem;
 }
@@ -852,7 +745,6 @@ details > summary::-webkit-details-marker { display: none; }
   }
 }
 
-/* Halo verde sutil + spotlight cálido al centro (donde corre el caballo) */
 .galloping-band::before {
   content: "";
   position: absolute;
@@ -870,7 +762,6 @@ details > summary::-webkit-details-marker { display: none; }
   pointer-events: none;
 }
 
-/* Pista cálida — toques dorados sutiles */
 .galloping-track {
   position: absolute;
   inset-inline: 15%;
@@ -886,7 +777,6 @@ details > summary::-webkit-details-marker { display: none; }
   filter: blur(1px);
 }
 
-/* Polvo dorado-verdoso */
 .galloping-dust span {
   position: absolute;
   width: 3px;
@@ -896,7 +786,6 @@ details > summary::-webkit-details-marker { display: none; }
   filter: blur(1.5px);
 }
 
-/* Contenedor que se mueve con scroll (left% se setea desde JS) */
 .galloping-horse {
   position: absolute;
   top: 50%;
@@ -913,7 +802,6 @@ details > summary::-webkit-details-marker { display: none; }
   .galloping-horse img { height: 10rem; }
 }
 
-/* Estela difusa detrás del caballo */
 .galloping-trail {
   position: absolute;
   top: 50%;

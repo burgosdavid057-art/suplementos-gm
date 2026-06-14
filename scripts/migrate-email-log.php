@@ -1,13 +1,6 @@
 <?php
 declare(strict_types=1);
-/**
- * Migración aditiva: crea la tabla email_log para auditar los emails enviados.
- *   - status:  pending | sent | failed
- *   - kind:    order-pending-customer | order-paid-customer | order-paid-owner | test
- *   - ref_id:  order.id u otro contexto
- *
- * Idempotente — CREATE TABLE IF NOT EXISTS.
- */
+
 require_once __DIR__ . '/../src/bootstrap.php';
 
 $pdo = db();

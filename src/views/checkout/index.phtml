@@ -39,11 +39,11 @@ $input_cls = 'w-full rounded-lg border border-silver-200 px-3 py-2.5 text-sm bg-
 
     <div class="space-y-5 min-w-0">
 
-      <!-- ─── 1) Datos del comprador (facturación) ───────── -->
+      
       <fieldset class="rounded-2xl border border-silver-200 bg-white p-5">
         <legend class="px-2 text-sm font-bold uppercase tracking-wider text-brand-600">1. Datos de facturación</legend>
 
-        <!-- Tipo de persona: tabs -->
+        
         <div class="grid grid-cols-2 gap-2 mb-5 p-1 bg-silver rounded-xl">
           <label class="cursor-pointer">
             <input type="radio" name="customer_type" value="natural" <?= $customerType === 'natural' ? 'checked' : '' ?> class="peer sr-only" data-customer-type>
@@ -59,7 +59,7 @@ $input_cls = 'w-full rounded-lg border border-silver-200 px-3 py-2.5 text-sm bg-
           </label>
         </div>
 
-        <!-- Nombre / Razón social -->
+        
         <label class="block">
           <span class="block text-sm font-semibold text-carbon mb-1">
             <span data-label-natural class="<?= $customerType === 'juridica' ? 'hidden' : '' ?>">Nombre completo *</span>
@@ -69,12 +69,12 @@ $input_cls = 'w-full rounded-lg border border-silver-200 px-3 py-2.5 text-sm bg-
           <?= $err_msg('customer_name') ?>
         </label>
 
-        <!-- Tipo de doc + Número -->
+        
         <div class="grid grid-cols-[110px_1fr] gap-3 mt-4">
           <label class="block">
             <span class="block text-sm font-semibold text-carbon mb-1">Tipo *</span>
             <select name="customer_doc_type" class="<?= $input_cls ?>" data-doc-type>
-              <!-- Las opciones se filtran dinámicamente según tipo de persona -->
+              
               <option value="CC"  data-for="natural"  <?= $docType === 'CC'  ? 'selected' : '' ?>>CC</option>
               <option value="CE"  data-for="natural"  <?= $docType === 'CE'  ? 'selected' : '' ?>>CE</option>
               <option value="PP"  data-for="natural"  <?= $docType === 'PP'  ? 'selected' : '' ?>>PP</option>
@@ -105,7 +105,7 @@ $input_cls = 'w-full rounded-lg border border-silver-200 px-3 py-2.5 text-sm bg-
           </label>
         </div>
 
-        <!-- Dirección de facturación -->
+        
         <div class="mt-5 pt-5 border-t border-silver-200">
           <p class="text-xs font-bold uppercase tracking-wider text-carbon-soft mb-3">Dirección de facturación</p>
 
@@ -130,7 +130,7 @@ $input_cls = 'w-full rounded-lg border border-silver-200 px-3 py-2.5 text-sm bg-
         </div>
       </fieldset>
 
-      <!-- ─── 2) Método de envío ────────────────── -->
+      
       <fieldset class="rounded-2xl border border-silver-200 bg-white p-5">
         <legend class="px-2 text-sm font-bold uppercase tracking-wider text-brand-600">2. ¿Cómo quieres recibirlo?</legend>
 
@@ -159,11 +159,11 @@ $input_cls = 'w-full rounded-lg border border-silver-200 px-3 py-2.5 text-sm bg-
         </div>
       </fieldset>
 
-      <!-- ─── 3a) Dirección de envío (PCE u Oriente cercano) ──── -->
+      
       <fieldset id="shipping-address-block" class="rounded-2xl border border-silver-200 bg-white p-5">
         <legend class="px-2 text-sm font-bold uppercase tracking-wider text-brand-600">3. Dirección de envío</legend>
 
-        <!-- Checkbox "mismo que facturación" -->
+        
         <label class="flex items-start gap-3 p-3 rounded-lg border-2 border-silver-200 cursor-pointer has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50/40 transition mb-4">
           <input type="checkbox" name="shipping_same_as_billing" value="1" <?= $shipSame ? 'checked' : '' ?>
                  data-ship-same class="mt-0.5 accent-brand-500 shrink-0">
@@ -173,7 +173,7 @@ $input_cls = 'w-full rounded-lg border border-silver-200 px-3 py-2.5 text-sm bg-
           </span>
         </label>
 
-        <!-- Campos de envío (solo visibles si destildó el checkbox) -->
+        
         <div data-shipping-fields class="<?= $shipSame ? 'hidden' : '' ?>">
           <label class="block">
             <span class="block text-sm font-semibold text-carbon mb-1">Dirección *</span>
@@ -200,7 +200,7 @@ $input_cls = 'w-full rounded-lg border border-silver-200 px-3 py-2.5 text-sm bg-
         </div>
       </fieldset>
 
-      <!-- ─── 3b) Terminal (solo bus) ──────────────── -->
+      
       <fieldset id="shipping-terminal-block" class="hidden rounded-2xl border border-silver-200 bg-white p-5">
         <legend class="px-2 text-sm font-bold uppercase tracking-wider text-brand-600">3. ¿En qué terminal recoges?</legend>
 
@@ -219,14 +219,14 @@ $input_cls = 'w-full rounded-lg border border-silver-200 px-3 py-2.5 text-sm bg-
         </p>
       </fieldset>
 
-      <!-- ─── 4) Notas opcionales ─────────────────── -->
+      
       <fieldset class="rounded-2xl border border-silver-200 bg-white p-5">
         <legend class="px-2 text-sm font-bold uppercase tracking-wider text-brand-600">4. Notas (opcional)</legend>
         <textarea name="shipping_notes" rows="2" placeholder="Ej. casa color azul, dejar en portería, llamar al llegar…" class="<?= $input_cls ?> resize-none"><?= $old_value('notes') ?></textarea>
       </fieldset>
     </div>
 
-    <!-- ─── Resumen lateral ──────────────── -->
+    
     <aside class="bg-silver rounded-2xl p-5 h-fit lg:sticky lg:top-24">
       <h2 class="font-bold text-lg mb-4">Resumen</h2>
 
@@ -255,7 +255,7 @@ $input_cls = 'w-full rounded-lg border border-silver-200 px-3 py-2.5 text-sm bg-
         <strong id="summary-total" class="text-brand-600">$0</strong>
       </div>
 
-      <!-- Consentimiento legal (obligatorio para SIC) -->
+      
       <label class="mt-5 flex items-start gap-2 text-xs text-carbon-soft cursor-pointer">
         <input type="checkbox" name="terms_accepted" required value="1"
                class="mt-0.5 accent-brand-500 shrink-0">

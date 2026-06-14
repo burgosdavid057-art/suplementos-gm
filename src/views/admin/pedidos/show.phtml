@@ -50,10 +50,10 @@ $canCancel    = in_array($status, ['PENDING','PAID','SHIPPED']);
 
 <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-5">
 
-  <!-- ─── Columna izquierda: detalle + acciones ─── -->
+  
   <div class="space-y-5 min-w-0">
 
-    <!-- Items del pedido -->
+    
     <section class="rounded-xl border border-silver-200 bg-white overflow-hidden">
       <header class="px-5 py-3 border-b border-silver-200 flex items-center justify-between">
         <h2 class="text-xs font-bold uppercase tracking-wider text-carbon-soft">Productos</h2>
@@ -86,7 +86,7 @@ $canCancel    = in_array($status, ['PENDING','PAID','SHIPPED']);
       </dl>
     </section>
 
-    <!-- Datos del cliente + facturación + envío -->
+    
     <section class="grid grid-cols-1 md:grid-cols-2 gap-3">
       <div class="rounded-xl border border-silver-200 bg-white p-4">
         <h3 class="text-xs font-bold uppercase tracking-wider text-carbon-soft mb-2">Comprador</h3>
@@ -129,7 +129,7 @@ $canCancel    = in_array($status, ['PENDING','PAID','SHIPPED']);
       </div>
     </section>
 
-    <!-- Tracking (si ya está enviado) -->
+    
     <?php if (in_array($status, ['SHIPPED','DELIVERED'])): ?>
       <section class="rounded-xl border border-blue-200 bg-blue-50/50 p-4">
         <h3 class="text-xs font-bold uppercase tracking-wider text-blue-900 mb-2 inline-flex items-center gap-1.5">
@@ -150,7 +150,7 @@ $canCancel    = in_array($status, ['PENDING','PAID','SHIPPED']);
       </section>
     <?php endif; ?>
 
-    <!-- Notas internas del admin -->
+    
     <section class="rounded-xl border border-silver-200 bg-white p-5">
       <h3 class="text-xs font-bold uppercase tracking-wider text-carbon-soft mb-3">Notas internas</h3>
       <form method="post" action="/admin/pedidos/<?= e($order['id']) ?>/notes">
@@ -164,7 +164,7 @@ $canCancel    = in_array($status, ['PENDING','PAID','SHIPPED']);
       </form>
     </section>
 
-    <!-- Log de emails relacionados -->
+    
     <section class="rounded-xl border border-silver-200 bg-white overflow-hidden">
       <header class="px-5 py-3 border-b border-silver-200">
         <h3 class="text-xs font-bold uppercase tracking-wider text-carbon-soft">Emails enviados</h3>
@@ -191,10 +191,10 @@ $canCancel    = in_array($status, ['PENDING','PAID','SHIPPED']);
     </section>
   </div>
 
-  <!-- ─── Columna derecha: acciones rápidas ─── -->
+  
   <aside class="space-y-3 min-w-0">
 
-    <!-- Acción: marcar enviado -->
+    
     <?php if ($canShip): ?>
       <section class="rounded-xl border-2 border-brand-300 bg-brand-50/40 p-4">
         <h3 class="text-sm font-bold mb-2 inline-flex items-center gap-1.5">
@@ -214,7 +214,7 @@ $canCancel    = in_array($status, ['PENDING','PAID','SHIPPED']);
       </section>
     <?php endif; ?>
 
-    <!-- Acción: marcar entregado -->
+    
     <?php if ($canDeliver): ?>
       <form method="post" action="/admin/pedidos/<?= e($order['id']) ?>/deliver"
             onsubmit="return confirm('¿Marcar como entregado?')">
@@ -225,7 +225,7 @@ $canCancel    = in_array($status, ['PENDING','PAID','SHIPPED']);
       </form>
     <?php endif; ?>
 
-    <!-- Acción: cancelar -->
+    
     <?php if ($canCancel): ?>
       <form method="post" action="/admin/pedidos/<?= e($order['id']) ?>/cancel"
             onsubmit="return confirm('¿Cancelar este pedido? Se notificará al cliente por email.')">
@@ -236,7 +236,7 @@ $canCancel    = in_array($status, ['PENDING','PAID','SHIPPED']);
       </form>
     <?php endif; ?>
 
-    <!-- Acción: reenviar emails -->
+    
     <section class="rounded-xl border border-silver-200 bg-white p-4">
       <h3 class="text-sm font-bold mb-2 inline-flex items-center gap-1.5">
         <?= icon('mail', 'w-4 h-4 text-brand-700') ?> Reenviar email
@@ -251,7 +251,7 @@ $canCancel    = in_array($status, ['PENDING','PAID','SHIPPED']);
       </form>
     </section>
 
-    <!-- Info de pago -->
+    
     <?php if (!empty($order['payment_tx_id'])): ?>
       <section class="rounded-xl border border-silver-200 bg-white p-4 text-xs space-y-1">
         <h3 class="text-xs font-bold uppercase tracking-wider text-carbon-soft mb-2">Pago</h3>
@@ -267,7 +267,7 @@ $canCancel    = in_array($status, ['PENDING','PAID','SHIPPED']);
       </section>
     <?php endif; ?>
 
-    <!-- Link al detalle público -->
+    
     <a href="/checkout/orden/<?= e($order['order_number']) ?>" target="_blank"
        class="block text-center text-xs text-carbon-soft hover:text-brand-700 py-2">
       Ver vista pública del pedido →

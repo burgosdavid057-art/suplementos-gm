@@ -21,14 +21,13 @@ $catIcons = [
   <div class="max-w-7xl mx-auto px-4 sm:px-6">
     <div class="flex items-center h-16 gap-3 sm:gap-6 lg:gap-8" style="height:64px;">
 
-      <!-- Logo: tamaños controlados por .brand-logo-nav (custom CSS), no
-           Tailwind responsive (sm:/lg: variants pueden no estar compiladas). -->
+      
       <a href="/" class="flex items-center group flex-shrink-0" aria-label="Suplementos GM — Inicio">
         <img src="/assets/logo-gm.png" alt="Suplementos GM"
              class="brand-logo-nav transition-transform group-hover:scale-105">
       </a>
 
-      <!-- Desktop nav (al lado del logo, no centrado) -->
+      
       <nav class="hidden lg:flex items-center gap-0.5 text-[15px] font-medium" aria-label="Principal">
         <a href="/" class="navlink <?= $current === '/' ? 'navlink-active' : '' ?>">Inicio</a>
         <a href="/productos" class="navlink <?= str_starts_with($current, '/productos') ? 'navlink-active' : '' ?>">Productos</a>
@@ -49,7 +48,7 @@ $catIcons = [
         <a href="/orden" class="navlink <?= str_starts_with($current, '/orden') ? 'navlink-active' : '' ?>">Mi pedido</a>
       </nav>
 
-      <!-- Buscador desktop (empuja todo lo demás a la derecha) -->
+      
       <form action="/productos" method="get" role="search" class="hidden md:flex flex-1 max-w-xs lg:max-w-sm ml-auto">
         <div class="relative w-full">
           <input type="search" name="q" placeholder="Buscar productos..."
@@ -60,10 +59,10 @@ $catIcons = [
         </div>
       </form>
 
-      <!-- Acciones derecha -->
+      
       <div class="flex items-center gap-1 sm:gap-2 ml-auto md:ml-0">
 
-        <!-- Buscador mobile (botón) -->
+        
         <button type="button"
                 data-mobile-search-toggle
                 aria-label="Buscar"
@@ -73,7 +72,7 @@ $catIcons = [
           </svg>
         </button>
 
-        <!-- Carrito -->
+        
         <a href="/carrito" id="cart-button"
            class="relative inline-flex items-center gap-2 h-10 px-3.5 sm:px-4 rounded-full bg-carbon hover:bg-brand-700 text-white text-sm font-semibold transition-colors group whitespace-nowrap">
           <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -85,7 +84,7 @@ $catIcons = [
                 class="inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-brand-500 text-white group-hover:bg-white group-hover:text-brand-700 text-[11px] font-bold transition-all">0</span>
         </a>
 
-        <!-- Hamburguesa mobile -->
+        
         <button type="button"
                 data-mobile-menu-open
                 aria-label="Abrir menú"
@@ -99,7 +98,7 @@ $catIcons = [
       </div>
     </div>
 
-    <!-- Buscador mobile expandible -->
+    
     <div data-mobile-search class="hidden md:hidden pb-3">
       <form action="/productos" method="get" role="search">
         <div class="relative">
@@ -113,7 +112,7 @@ $catIcons = [
     </div>
   </div>
 
-  <!-- Mega-dropdown categorías (full width) -->
+  
   <div data-dropdown-panel="categories"
        class="hidden border-t border-silver-200 bg-white shadow-lg">
     <div class="max-w-7xl mx-auto px-6 py-6">
@@ -144,7 +143,6 @@ $catIcons = [
   </div>
 </header>
 
-<!-- Mobile menu (slide-in panel) -->
 <div data-mobile-menu class="fixed inset-0 z-50 hidden lg:hidden">
   <div data-mobile-menu-close data-overlay class="absolute inset-0 bg-carbon/50"></div>
   <aside data-panel class="absolute right-0 top-0 h-full w-80 max-w-[88%] bg-white shadow-2xl flex flex-col transform translate-x-full">

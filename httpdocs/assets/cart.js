@@ -1,16 +1,4 @@
-/*
- * Carrito 100% en cliente. Persistido en localStorage.
- * Estructura: [{ id, name, price, image, qty }]
- *
- * API global:
- *   Cart.add(item)        agrega 1 unidad (o sube qty si ya estaba)
- *   Cart.set(id, qty)     fija cantidad (0 = remueve)
- *   Cart.remove(id)
- *   Cart.clear()
- *   Cart.items()          → array
- *   Cart.count()          → suma de qty
- *   Cart.subtotal()       → suma de price*qty
- */
+
 (function () {
   const KEY = "sgm_cart_v1";
 
@@ -69,7 +57,7 @@
 
   document.addEventListener("DOMContentLoaded", refreshUI);
 
-  // Bind para botones [data-add-to-cart]
+  
   document.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-add-to-cart]");
     if (!btn) return;
@@ -84,7 +72,7 @@
     if (!item.id) return;
     Cart.add(item);
 
-    // Feedback visual
+    
     const original = btn.textContent;
     btn.textContent = "✓ Añadido";
     btn.classList.add("bg-brand-700");

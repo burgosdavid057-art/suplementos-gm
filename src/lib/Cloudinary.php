@@ -1,21 +1,12 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Cloudinary helpers.
- *
- * Dos modalidades de uso:
- *   1. Browser (unsigned upload widget): usa cloud_name + upload_preset.
- *      Lo usa el admin para subir imágenes manualmente.
- *   2. Server-side (signed upload): usa cloud_name + api_key + api_secret.
- *      Lo usa el sync de Alegra para mirroring de imágenes del ERP.
- */
 class Cloudinary {
     public static function isConfigured(): bool {
         return !empty(env('CLOUDINARY_CLOUD_NAME')) && !empty(env('CLOUDINARY_UPLOAD_PRESET'));
     }
 
-    /** True si tenemos las llaves para hacer upload firmado server-side. */
+    
     public static function isFullyConfigured(): bool {
         return !empty(env('CLOUDINARY_CLOUD_NAME'))
             && !empty(env('CLOUDINARY_API_KEY'))
@@ -38,15 +29,7 @@ class Cloudinary {
         return env('CLOUDINARY_API_SECRET');
     }
 
-    /**
-     * Sube una imagen a Cloudinary firmando la petición con el api_secret.
-     *
-     * $source puede ser:
-     *   - URL pública: "https://..."           (Cloudinary la descarga)
-     *   - Data URI:    "data:image/...;base64,..."
-     *
-     * Devuelve secure_url o null si falla.
-     */
+    
     public static function uploadSigned(string $source, string $publicId, string $folder = 'alegra-sync'): ?string {
         if (!self::isFullyConfigured()) return null;
 
@@ -55,8 +38,8 @@ class Cloudinary {
         $apiSecret = (string) self::apiSecret();
         $timestamp = (string) time();
 
-        // Cloudinary firma con los parámetros que NO sean api_key, file,
-        // signature, resource_type ni cloud_name, ordenados alfabéticamente.
+        
+        
         $params = [
             'folder'           => $folder,
             'overwrite'        => 'true',
@@ -96,18 +79,14 @@ class Cloudinary {
         return is_string($url) && $url !== '' ? $url : null;
     }
 
-    /**
-     * Sube bytes binarios codificándolos como data URI base64.
-     * Útil cuando descargamos la imagen con auth (Alegra) y queremos
-     * pasarla a Cloudinary sin re-exponer el endpoint protegido.
-     */
+    
     public static function uploadBytes(string $bytes, string $publicId, string $mime = 'image/jpeg', string $folder = 'alegra-sync'): ?string {
         if ($bytes === '') return null;
         $b64 = 'data:' . $mime . ';base64,' . base64_encode($bytes);
         return self::uploadSigned($b64, $publicId, $folder);
     }
 
-    /** Heurística simple para mime-type a partir de los magic bytes. */
+    
     public static function guessMime(string $bytes): string {
         if (strncmp($bytes, "\xFF\xD8\xFF", 3) === 0)  return 'image/jpeg';
         if (strncmp($bytes, "\x89PNG", 4) === 0)        return 'image/png';

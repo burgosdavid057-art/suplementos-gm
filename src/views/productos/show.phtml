@@ -17,7 +17,7 @@ $mainImage = $images[0] ?? null;
 
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-10 lg:gap-12">
 
-    <!-- ─── Galería ───────────────────────────────── -->
+    
     <div data-anim="scale-in">
       <div class="product-detail-img-frame relative aspect-square overflow-hidden rounded-xl sm:rounded-2xl ring-1 ring-silver-200">
         <?php if ($mainImage): ?>
@@ -45,7 +45,7 @@ $mainImage = $images[0] ?? null;
       <?php endif; ?>
     </div>
 
-    <!-- ─── Info + acciones ───────────────────────── -->
+    
     <div data-anim="fade-up">
       <p class="text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-brand-600"><?= e($product['category_name']) ?></p>
       <h1 class="brand-title text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mt-1.5 sm:mt-2 leading-tight"><?= e($product['name']) ?></h1>
@@ -65,7 +65,7 @@ $mainImage = $images[0] ?? null;
       </div>
 
       <?php if ($product['stock'] > 0): ?>
-        <!-- Cantidad + acciones — en móvil 2 filas: row con [cant + Añadir] luego "Ir al carrito" full -->
+        
         <div class="mt-5 sm:mt-7 grid sm:flex sm:flex-wrap items-center gap-2 sm:gap-3">
           <div class="flex">
             <div class="flex items-center rounded-md border border-silver-200 bg-white">
@@ -122,7 +122,7 @@ $mainImage = $images[0] ?? null;
     </div>
   </div>
 
-  <!-- ─── Relacionados ─────────────────────────────── -->
+  
   <?php if (!empty($related)): ?>
     <div class="mt-14 sm:mt-20">
       <h2 class="brand-title text-xl sm:text-2xl font-bold mb-5 sm:mb-6">También te puede interesar</h2>

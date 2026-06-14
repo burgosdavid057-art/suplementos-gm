@@ -37,9 +37,6 @@ $qsBase = ['categoria' => $opts['category'], 'marca' => $opts['brand'], 'q' => $
   </div>
 </section>
 
-<!-- Layout principal del catálogo: usa CSS custom (.catalog-layout) en lugar
-     de utilidades Tailwind para no depender de la recompilación. Móvil:
-     flex column (todo apilado al 100%). Desktop ≥1024px: grid [260px 1fr]. -->
 <div class="catalog-layout">
   <?php
     $activeFilters = (int)(!empty($opts['q']))
@@ -47,9 +44,7 @@ $qsBase = ['categoria' => $opts['category'], 'marca' => $opts['brand'], 'q' => $
       + (int)(!empty($opts['min']))
       + (int)(!empty($opts['max']));
   ?>
-  <!-- Sidebar de filtros: en móvil se colapsa con un botón toggle; en desktop
-       siempre se muestra (el botón se oculta con lg:hidden y la regla
-       .filter-panel { display:block !important } en desktop). -->
+  
   <aside class="catalog-sidebar">
     <button type="button"
             data-filter-toggle
@@ -242,7 +237,7 @@ $qsBase = ['categoria' => $opts['category'], 'marca' => $opts['brand'], 'q' => $
         }
       ?>
         <nav class="mt-10 sm:mt-12 flex flex-wrap justify-center items-center gap-1 sm:gap-1.5 text-sm">
-          <!-- Botón anterior -->
+          
           <?php if ($current > 1): ?>
             <a href="?<?= build_qs($qsBase, ['p' => $current - 1]) ?>"
                aria-label="Página anterior"
@@ -263,7 +258,7 @@ $qsBase = ['categoria' => $opts['category'], 'marca' => $opts['brand'], 'q' => $
             <?php endif; ?>
           <?php endforeach; ?>
 
-          <!-- Botón siguiente -->
+          
           <?php if ($current < $total): ?>
             <a href="?<?= build_qs($qsBase, ['p' => $current + 1]) ?>"
                aria-label="Página siguiente"
@@ -273,7 +268,7 @@ $qsBase = ['categoria' => $opts['category'], 'marca' => $opts['brand'], 'q' => $
           <?php endif; ?>
         </nav>
 
-        <!-- Indicador "Página X de Y" — solo en móvil, ayuda al contexto -->
+        
         <p class="mt-3 sm:hidden text-center text-xs text-carbon-soft">
           Página <strong class="text-carbon"><?= $current ?></strong> de <?= $total ?>
         </p>
